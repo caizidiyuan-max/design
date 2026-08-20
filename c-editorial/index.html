@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Re株式会社 | Mental health for Challengers</title>
+<meta name="description" content="挑戦する人のメンタルヘルス。知識×実践型研修、CXO向け1on1支援、事業支援を行うRe株式会社のコーポレートサイト(デザイン案C:エディトリアル/アート系)">
+<style>
+/* ==========================================================================
+   0. リセット / 基本設定
+   ========================================================================== */
+:root{
+  --navy-0:#080a14;
+  --navy-1:#10142a;
+  --navy-2:#1b2242;
+  --ink-light:#f4f1e8;
+  --ink-light-dim:rgba(244,241,232,0.62);
+  --ink-light-faint:rgba(244,241,232,0.32);
+
+  --cream-0:#f3ede1;
+  --cream-1:#eee6d6;
+  --ink-dark:#211c16;
+  --ink-dark-dim:rgba(33,28,22,0.62);
+  --ink-dark-faint:rgba(33,28,22,0.34);
+
+  --terracotta:#b3593a;
+  --terracotta-soft:#c97a53;
+  --gold:#d8c48f;
+
+  --serif: "Yu Mincho","YuMincho","Hiragino Mincho ProN","Times New Roman",serif;
+  --mono: "Courier New", ui-monospace, monospace;
+  --sans: "Hiragino Kaku Gothic ProN","Yu Gothic","Segoe UI",sans-serif;
+
+  --progress: 0;
+  --text-color: var(--ink-light);
+  --text-dim: var(--ink-light-dim);
+  --text-faint: var(--ink-light-faint);
+  --accent: var(--gold);
+  --glow-rgb: 216,196,143; /* テキストホバー時の光(dark時はgold) */
+}
+
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0;
+  font-family:var(--sans);
+  background:var(--navy-0);
+  color:var(--text-color);
+  overflow-x:hidden;
+  transition: color .6s ease;
+}
+body[data-theme="light"]{
+  --text-color: var(--ink-dark);
+  --text-dim: var(--ink-dark-dim);
+  --text-faint: var(--ink-dark-faint);
+  --accent: var(--terracotta);
+  --glow-rgb: 179,89,58; /* light時はterracottaの淡い光 */
+}
+img,svg{ max-width:100%; display:block; }
+a{ color:inherit; text-decoration:none; }
+h1,h2,h3,p{ margin:0; }
+button{ font-family:inherit; }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.2s !important; scroll-behavior:auto !important; }
+}
+
+/* ==========================================================================
+   1. 背景レイヤー(固定・スクロール進度で夜明け→握手のトーンへ)
+   ========================================================================== */
+.bg-fixed{
+  position:fixed;
+  inset:0;
+  z-index:-2;
+  pointer-events:none;
+}
+.bg-dark{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse 90% 60% at 50% -10%, #232c52 0%, transparent 60%),
+    linear-gradient(180deg, var(--navy-0) 0%, var(--navy-1) 45%, var(--navy-2) 100%);
+}
+.bg-light{
+  position:absolute; inset:0;
+  opacity: var(--progress);
+  background:
+    radial-gradient(ellipse 70% 50% at 78% 18%, rgba(179,89,58,0.20) 0%, transparent 62%),
+    linear-gradient(180deg, var(--cream-0) 0%, var(--cream-1) 100%);
+  transition: opacity .1s linear;
+}
+
+/* 光の粒子(暗い間だけ見える。星屑のように数多く・大小さまざま・それぞれ違う速度で瞬く) */
+.particles{
+  position:absolute; inset:0;
+  opacity: calc(1 - var(--progress));
+  transition: opacity .1s linear;
+}
+
+/* Canvas粒子(流れ場に沿って群れのように泳ぐ)。JSが有効なときだけ表示し、
+   そのときは静的なCSS粒子を隠して二重表示を防ぐ。
+   reduced-motion ではJS側がbodyにクラスを付けないため、常に静的なCSS粒子が出る。 */
+.particle-canvas{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  display:none;
+}
+body.js-canvas .particle-canvas{ display:block; }
+body.js-canvas .particle-layer{ display:none; }
+@media (prefers-reduced-motion: reduce){
+  .particle-canvas{ display:none !important; }
+  body.js-canvas .particle-layer{ display:block; }
+}
+
+/* 星屑が細い光の軌跡(パス)に沿って静かに流れていく演出。
+   時間ベースのSMILアニメーション(animateMotion)のため、prefers-reduced-motion
+   ではCSSの animation-duration 上書きが効かない → レイヤーごと非表示にする。 */
+.star-trails{
+  position:absolute; inset:0;
+  opacity: calc(1 - var(--progress));
+  transition: opacity .1s linear;
+}
+@media (prefers-reduced-motion: reduce){
+  .star-trails{ display:none; }
+}
+.particle-layer{
+  position:absolute; inset:0;
+  /* レイヤー全体はスクロール量にだけ軽く連動させる(単調な繰り返し防止)。
+     マウスへの反応は粒子1つずつが個別に持つ(.particle の translate)ため、
+     ここでは --mx / --my を扱わない。 */
+  transform: translateY(calc(var(--progress) * var(--pdrift,-30px)));
+  transition: transform .25s ease-out;
+}
+.particle{
+  position:absolute;
+  width:5px; height:5px;
+  border-radius:50%;
+  background: radial-gradient(circle, rgba(216,196,143,0.95) 0%, rgba(216,196,143,0) 70%);
+  filter: blur(var(--blur, 0.5px));
+  /* 空気中に浮かぶ塵のようにマウス位置へ微妙に反応する。
+     --preact(反応度)は層ごとに変え、手前ほど大きく・奥ほど小さく反応させることで
+     奥行きのある3D空間の感覚を作る。translate/scale は transform とは別の
+     独立したCSSプロパティなので、drift(transform)・twinkle(scale)と
+     衝突せずに重ね合わさる。 */
+  translate: calc(var(--mx,0px) * var(--preact,0.4)) calc(var(--my,0px) * var(--preact,0.4));
+  transition: translate .35s ease-out;
+  animation: drift var(--drift-dur,14s) ease-in-out infinite, twinkle var(--tw-dur,4s) ease-in-out infinite;
+  animation-delay: var(--drift-delay,0s), var(--tw-delay,0s);
+}
+.particle.is-star{
+  border-radius:0;
+  background:none;
+  filter:none;
+}
+.particle.is-star::before{
+  content:"";
+  position:absolute; inset:0;
+  background:
+    linear-gradient(180deg, transparent 0%, rgba(216,196,143,0.95) 46%, transparent 100%),
+    linear-gradient(90deg, transparent 0%, rgba(216,196,143,0.95) 46%, transparent 100%);
+  filter: blur(0.3px);
+}
+/* 漂う動き(位置のみ)。transform を使うのでこの中では opacity / scale を触らない */
+/* 「大空をはばたく」方向性を軽く感じさせるため、上昇は速く・上での滞空を長く、
+   降りるときはゆっくり戻す非対称カーブにしている(0%と100%は同一地点でループを継ぎ目なく)。 */
+@keyframes drift{
+  0%{ transform:translateY(0) translateX(0); }
+  38%{ transform:translateY(-46px) translateX(10px); }
+  70%{ transform:translateY(-52px) translateX(16px); }
+  100%{ transform:translateY(0) translateX(0); }
+}
+/* 瞬き:ふわっとした明滅。opacity と scale(独立プロパティ)だけを動かし、
+   drift の transform とは競合しないようにする。個々に速度・タイミングを
+   変えて単調にならないようにする */
+@keyframes twinkle{
+  0%{ opacity:.1; scale:.7; }
+  45%{ opacity:1; scale:1.15; }
+  70%{ opacity:.35; scale:.85; }
+  100%{ opacity:.1; scale:.7; }
+}
+
+/* 握手の線画(光の場面で現れる) */
+.handshake-art{
+  position:absolute;
+  right:4%; bottom:6%;
+  width:min(46vw, 520px);
+  opacity: calc(var(--progress) * 1);
+  transition: opacity .1s linear, transform .25s ease-out;
+  transform: translate3d(calc(var(--mx,0px) * 0.15), calc(var(--my,0px) * 0.15), 0);
+}
+.handshake-art svg{ width:100%; height:auto; }
+
+/* ==========================================================================
+   2. 進行度インジケーター & ヘッダー(mix-blend-modeで背景を問わず視認可能)
+   ========================================================================== */
+header.site-header{
+  position:fixed; top:0; left:0; right:0;
+  z-index:40;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: clamp(16px,3vw,28px) clamp(18px,4vw,48px);
+  mix-blend-mode:difference;
+}
+.logo{
+  font-family:var(--mono);
+  font-size:15px;
+  letter-spacing:0.18em;
+  color:#fff;
+  font-weight:700;
+}
+.logo span{ opacity:.55; font-weight:400; }
+nav.main-nav{ display:flex; gap:clamp(18px,3vw,40px); }
+nav.main-nav a{
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:0.16em;
+  color:#fff;
+  position:relative;
+  padding-bottom:3px;
+}
+nav.main-nav a::after{
+  content:"";
+  position:absolute; left:0; bottom:0; width:0; height:1px;
+  background:#fff; transition:width .3s ease;
+}
+nav.main-nav a:hover::after{ width:100%; }
+
+.progress-ui{
+  position:fixed;
+  right:clamp(14px,3vw,32px);
+  bottom:clamp(18px,3vw,36px);
+  z-index:40;
+  mix-blend-mode:difference;
+  color:#fff;
+  font-family:var(--mono);
+  text-align:right;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:8px;
+  pointer-events:none;
+}
+.progress-ui .count{ font-size:13px; letter-spacing:0.14em; }
+.progress-ui .count .cur{ font-size:16px; }
+.progress-ui .label{ font-size:10px; letter-spacing:0.2em; opacity:.75; }
+.progress-ui .track{
+  width:1px; height:64px;
+  background:rgba(255,255,255,0.28);
+  position:relative;
+}
+.progress-ui .track em{
+  position:absolute; left:-1.5px; top:0;
+  width:4px; height:4px; border-radius:50%;
+  background:#fff;
+  transform:translateY(var(--dot-y,0px));
+  transition:transform .2s linear;
+}
+
+/* ==========================================================================
+   3. レイアウト共通
+   ========================================================================== */
+main{ position:relative; z-index:1; }
+.section{
+  position:relative;
+  padding: clamp(90px,14vh,160px) clamp(20px,6vw,80px);
+  min-height:100svh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.section-inner{ max-width:1180px; margin:0 auto; width:100%; }
+.eyebrow{
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:0.32em;
+  color:var(--accent);
+  display:flex; align-items:center; gap:14px;
+  margin-bottom:clamp(20px,3vw,34px);
+}
+.eyebrow::before{
+  content:"";
+  width:34px; height:1px;
+  background:var(--accent);
+}
+.headline{
+  font-family:var(--serif);
+  font-weight:400;
+  font-size:clamp(34px,6.4vw,84px);
+  line-height:1.32;
+  letter-spacing:0.04em;
+  color:var(--text-color);
+}
+.headline em{
+  font-style:normal;
+  color:var(--accent);
+}
+.poetic{
+  font-family:var(--serif);
+  font-size:clamp(17px,2vw,22px);
+  letter-spacing:0.14em;
+  line-height:2;
+  color:var(--text-dim);
+  margin-top:clamp(18px,3vw,30px);
+  max-width:46em;
+}
+.body-text{
+  font-family:var(--sans);
+  font-size:clamp(14px,1.5vw,16px);
+  line-height:2.1;
+  letter-spacing:0.03em;
+  color:var(--text-dim);
+  max-width:42em;
+}
+
+/* 文章ブロックの落下アニメーション(JS未対応/reduced-motionでは常に通常表示。
+   body.js-fall がある時だけ「少し上から落ちて着地する」演出を行う) */
+.fall-in{ opacity:1; transform:none; }
+body.js-fall .fall-in{
+  opacity:0;
+  transform: translateY(-26px);
+  transition:
+    opacity .6s cubic-bezier(.22,.61,.36,1),
+    transform .78s cubic-bezier(.22,1.28,.36,1);
+  transition-delay: calc(var(--fall-delay, 0) * 1ms);
+}
+body.js-fall .fall-in.is-visible{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* 文章ホバー時の光(エディトリアルの静けさを保つ、ごく淡いグロー)。
+   hover:hover + pointer:fine の判定でタッチ端末では発動しない。 */
+@media (hover:hover) and (pointer:fine){
+  .headline, .poetic, .body-text, .intro h1, .intro .kanban,
+  .hero .chapter-no, .hero .sub, .eyebrow,
+  .service-title, .service-desc,
+  .credential h3, .credential p, .credential .tag,
+  .specialty-card .s-poetic, .specialty-card .s-tag, .specialty-card p, .specialty-card .s-num,
+  .support-card h3, .support-card p, .support-card .num,
+  .support-note, .contact-meta{
+    transition: text-shadow .55s ease, color .55s ease;
+  }
+  .headline:hover, .poetic:hover, .body-text:hover, .intro h1:hover, .intro .kanban:hover,
+  .hero .chapter-no:hover, .hero .sub:hover, .eyebrow:hover,
+  .service-title:hover, .service-desc:hover,
+  .credential:hover h3, .credential:hover p, .credential:hover .tag,
+  .specialty-card:hover .s-poetic, .specialty-card:hover .s-tag,
+  .specialty-card:hover p, .specialty-card:hover .s-num,
+  .support-card:hover h3, .support-card:hover p, .support-card:hover .num,
+  .support-note:hover, .contact-meta:hover{
+    text-shadow:
+      0 0 22px rgba(var(--glow-rgb), .40),
+      0 0 6px  rgba(var(--glow-rgb), .22);
+  }
+  /* 淡色の本文は、光ると同時にわずかに明度が上がる */
+  .poetic:hover, .body-text:hover, .hero .sub:hover, .service-desc:hover,
+  .credential:hover p, .specialty-card:hover p, .support-card:hover p,
+  .support-note:hover{
+    color: var(--text-color);
+  }
+
+  /* 図形(アイコン・イラスト)にも、文章と同じトーンの淡いグローを追加。
+     drop-shadow は矩形ではなく図形の輪郭に沿って光るため、円・線画どちらにも馴染む。 */
+  .service-visual, .intro .enter-link .circle, .opening-start .ost-circle,
+  .handshake-art svg{
+    transition: filter .5s ease, border-color .5s ease, transform .4s ease;
+  }
+  .service-visual:hover{
+    filter: drop-shadow(0 0 16px rgba(var(--glow-rgb), .55));
+    border-color: var(--accent);
+  }
+  .intro .enter-link:hover .circle{
+    filter: drop-shadow(0 0 10px rgba(var(--glow-rgb), .6));
+  }
+  .opening-start:hover .ost-circle{
+    filter: drop-shadow(0 0 10px rgba(216,196,143,.65));
+  }
+  /* 握手アイコンは背景の固定レイヤーにあり通常はクリックを透過させているが、
+     このメディアクエリの中でだけ図形自体にホバーを許可し、光の反応をつける。
+     手前にコンテンツがある場所ではそちらが先にヒットするため通常の操作は妨げない。 */
+  .handshake-art{ pointer-events:auto; }
+  .handshake-art:hover svg{
+    filter: drop-shadow(0 0 20px rgba(216,196,143,.7));
+  }
+}
+@media (prefers-reduced-motion: reduce){
+  .headline, .poetic, .body-text, .service-desc, .support-note{ transition:none; }
+}
+
+/* ==========================================================================
+   4. イントロ(通常フローの最初のセクション。JS無効でも破綻しない)
+   ========================================================================== */
+.intro{
+  min-height:100svh;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center;
+  padding: 24px;
+  position:relative;
+}
+.intro .kanban{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:0.5em;
+  color:var(--text-faint);
+  margin-bottom:clamp(28px,5vw,50px);
+  text-transform:uppercase;
+}
+.intro h1{
+  font-family:var(--serif);
+  font-weight:400;
+  font-size:clamp(30px,7vw,88px);
+  line-height:1.5;
+  letter-spacing:0.06em;
+  color:var(--text-color);
+}
+.intro h1 small{
+  display:block;
+  font-family:var(--mono);
+  font-size:clamp(11px,1.6vw,15px);
+  letter-spacing:0.3em;
+  color:var(--text-faint);
+  margin-top:clamp(20px,4vw,34px);
+}
+.intro .enter-link{
+  margin-top:clamp(50px,8vw,90px);
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:0.3em;
+  color:var(--text-dim);
+}
+.intro .enter-link .circle{
+  width:56px; height:56px;
+  border:1px solid var(--text-faint);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  transition:border-color .4s ease, transform .4s ease;
+}
+.intro .enter-link:hover .circle{ border-color:var(--accent); transform:translateY(4px); }
+.intro .enter-link:active .circle{ transform:scale(.85); border-color:var(--accent); transition:transform .14s cubic-bezier(.3,.7,.4,1); }
+.intro .enter-link .circle svg{ width:16px; height:16px; }
+
+.scroll-cue{
+  position:absolute;
+  left:50%; bottom:clamp(28px,5vh,54px);
+  transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:12px;
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:0.4em;
+  color:var(--text-faint);
+}
+.scroll-cue .line{
+  width:1px; height:46px;
+  background:linear-gradient(to bottom, var(--text-faint), transparent);
+  position:relative;
+  overflow:hidden;
+}
+.scroll-cue .line::after{
+  content:"";
+  position:absolute; left:0; top:-100%;
+  width:100%; height:100%;
+  background:var(--accent);
+  animation: scrollline 2.6s ease-in-out infinite;
+}
+@keyframes scrollline{
+  0%{ top:-100%; }
+  60%{ top:100%; }
+  100%{ top:100%; }
+}
+
+/* ==========================================================================
+   5. HERO
+   ========================================================================== */
+.hero{
+  align-items:flex-start;
+}
+.hero .chapter-no{
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:0.3em;
+  color:var(--text-faint);
+  margin-bottom:18px;
+}
+.hero .headline{ max-width:14em; }
+.hero .sub{
+  margin-top:clamp(24px,4vw,40px);
+  font-family:var(--serif);
+  font-size:clamp(15px,1.8vw,20px);
+  letter-spacing:0.1em;
+  line-height:2;
+  color:var(--text-dim);
+}
+
+/* ==========================================================================
+   6. SERVICES
+   ========================================================================== */
+.service-block{
+  display:grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap:clamp(40px,6vw,90px);
+  align-items:center;
+}
+.service-block:nth-of-type(even){ direction:rtl; }
+.service-block:nth-of-type(even) > *{ direction:ltr; }
+.service-visual{
+  aspect-ratio:1/1;
+  border:1px solid var(--text-faint);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  position:relative;
+}
+.service-visual svg{ width:58%; height:58%; }
+.service-index{
+  position:absolute; top:8%; left:8%;
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:0.2em;
+  color:var(--text-faint);
+}
+.service-title{
+  font-family:var(--serif);
+  font-size:clamp(26px,3.6vw,46px);
+  line-height:1.5;
+  letter-spacing:0.04em;
+  color:var(--text-color);
+  margin-bottom:20px;
+}
+.service-title small{
+  display:block;
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:0.22em;
+  color:var(--accent);
+  margin-bottom:14px;
+}
+.service-desc{
+  font-family:var(--sans);
+  font-size:clamp(14px,1.5vw,15.5px);
+  line-height:2.1;
+  color:var(--text-dim);
+  letter-spacing:0.02em;
+}
+.service-desc + .service-desc{ margin-top:14px; }
+.services-wrap .section-inner > .eyebrow{ margin-bottom:clamp(50px,8vw,90px); }
+.service-block + .service-block{ margin-top:clamp(70px,11vw,140px); }
+
+/* ==========================================================================
+   7. 実績
+   ========================================================================== */
+.credentials{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(260px,1fr));
+  gap:clamp(24px,3vw,40px);
+  margin-top:clamp(50px,7vw,80px);
+}
+.credential{
+  border-top:1px solid var(--text-faint);
+  padding-top:22px;
+}
+.credential .tag{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:0.2em;
+  color:var(--accent);
+}
+.credential h3{
+  font-family:var(--serif);
+  font-size:clamp(19px,2.2vw,25px);
+  line-height:1.6;
+  margin:12px 0 10px;
+  color:var(--text-color);
+}
+.credential p{
+  font-family:var(--sans);
+  font-size:14px;
+  line-height:1.9;
+  color:var(--text-dim);
+}
+
+/* ==========================================================================
+   7b. 専門分野
+   ========================================================================== */
+.specialty-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(280px,1fr));
+  gap:clamp(30px,4vw,50px);
+  margin-top:clamp(50px,7vw,80px);
+}
+.specialty-card{
+  border-top:1px solid var(--text-faint);
+  padding-top:24px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.specialty-card .s-num{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:0.2em;
+  color:var(--accent);
+}
+.specialty-card .s-poetic{
+  font-family:var(--serif);
+  font-size:clamp(19px,2.2vw,25px);
+  line-height:1.7;
+  color:var(--text-color);
+  letter-spacing:0.03em;
+}
+.specialty-card .s-tag{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:0.18em;
+  color:var(--text-faint);
+}
+.specialty-card p{
+  font-family:var(--sans);
+  font-size:14px;
+  line-height:2;
+  color:var(--text-dim);
+}
+
+/* ==========================================================================
+   8. 安心の運用サポート
+   ========================================================================== */
+.support-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(280px,1fr));
+  gap:clamp(30px,4vw,50px);
+  margin-top:clamp(50px,7vw,80px);
+}
+.support-card{
+  background: rgba(255,255,255,0.03);
+  border:1px solid var(--text-faint);
+  padding:clamp(26px,3vw,38px);
+  border-radius:2px;
+}
+body[data-theme="light"] .support-card{
+  background: rgba(255,255,255,0.35);
+}
+.support-card .num{
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--accent);
+  letter-spacing:0.2em;
+}
+.support-card h3{
+  font-family:var(--serif);
+  font-size:clamp(19px,2.2vw,24px);
+  margin:14px 0 14px;
+  color:var(--text-color);
+  line-height:1.6;
+}
+.support-card p{
+  font-family:var(--sans);
+  font-size:14px;
+  line-height:2;
+  color:var(--text-dim);
+}
+.support-note{
+  margin-top:clamp(40px,5vw,60px);
+  padding:clamp(20px,3vw,28px) clamp(22px,3vw,30px);
+  border-left:2px solid var(--accent);
+  font-family:var(--serif);
+  font-size:clamp(14.5px,1.6vw,16.5px);
+  line-height:2.1;
+  color:var(--text-dim);
+  max-width:48em;
+}
+
+/* ==========================================================================
+   9. CONTACT
+   ========================================================================== */
+.contact-section{ text-align:center; align-items:center; }
+.contact-section .headline{ max-width:16em; }
+.contact-cta{
+  margin-top:clamp(40px,6vw,64px);
+  display:inline-flex; flex-direction:column; align-items:center; gap:18px;
+}
+.contact-cta a.btn{
+  font-family:var(--mono);
+  font-size:13px;
+  letter-spacing:0.32em;
+  padding:22px 64px;
+  border:1px solid var(--accent);
+  color:var(--text-color);
+  border-radius:0; /* エディトリアルの直線基調に合わせ、丸みを排して品位を出す */
+  transition:background .35s ease, color .35s ease;
+}
+.contact-cta a.btn:hover{
+  background:var(--accent);
+  color:var(--cream-0);
+}
+.contact-meta{
+  margin-top:24px;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:0.14em;
+  color:var(--text-faint);
+  line-height:2;
+}
+
+/* ==========================================================================
+   10. フッター
+   ========================================================================== */
+footer{
+  position:relative; z-index:1;
+  padding:clamp(50px,7vw,80px) clamp(20px,6vw,80px) clamp(30px,4vw,50px);
+  display:flex; flex-wrap:wrap; gap:24px;
+  align-items:center; justify-content:space-between;
+  border-top:1px solid var(--text-faint);
+}
+footer .f-logo{
+  font-family:var(--mono);
+  font-size:14px;
+  letter-spacing:0.2em;
+  color:var(--text-color);
+}
+footer .f-meta{
+  font-family:var(--sans);
+  font-size:12px;
+  letter-spacing:0.05em;
+  color:var(--text-faint);
+  line-height:1.9;
+}
+footer .f-nav{ display:flex; gap:24px; }
+footer .f-nav a{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:0.14em;
+  color:var(--text-dim);
+}
+
+/* ==========================================================================
+   10b. オープニング演出
+   ========================================================================== */
+.opening-overlay{
+  position:fixed; inset:0;
+  z-index:900;
+  background: var(--navy-0);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+  opacity:1;
+  transition: opacity .9s ease;
+}
+.opening-overlay.is-done{ opacity:0; pointer-events:none; }
+.opening-overlay[hidden]{ display:none; }
+
+.opening-stage{
+  position:relative; z-index:2;
+  text-align:center;
+  transition: opacity .5s ease;
+}
+.opening-overlay.is-launching .opening-stage{ opacity:0; pointer-events:none; }
+
+.opening-start{
+  appearance:none; background:none; border:none; cursor:pointer;
+  color:var(--ink-light);
+  display:inline-flex; flex-direction:column; align-items:center; gap:16px;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:0.3em;
+}
+.opening-start .ost-circle{
+  width:60px; height:60px;
+  border:1px solid var(--ink-light-faint);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  transition:border-color .4s ease, transform .4s ease;
+}
+.opening-start:hover .ost-circle{ border-color:var(--gold); transform:translateY(-3px); }
+.opening-start .ost-circle svg{ width:16px; height:16px; color:var(--gold); }
+/* クリックした瞬間、押した手応えが分かるようにボタンをきゅっと縮める */
+.opening-start:active .ost-circle,
+.opening-start.is-pressed .ost-circle{
+  transform:scale(.85);
+  border-color:var(--gold);
+  transition:transform .14s cubic-bezier(.3,.7,.4,1), border-color .14s ease;
+}
+
+/* 1羽の燕:左下から右上へ、一定速度で。進むほど小さく・薄く(=遠ざかって見える) */
+.opening-swallow{
+  position:absolute;
+  left:-6%; bottom:16%;
+  width:clamp(70px, 10vw, 128px);
+  z-index:1;
+  opacity:0;
+  pointer-events:none;
+  will-change: translate, scale, opacity;
+}
+.opening-swallow svg{ width:100%; height:auto; display:block; }
+.opening-overlay.is-launching .opening-swallow{
+  /* 移動(translate/rotate)は linear で一定速度。縮小・フェード(scale/opacity)は
+     独立プロパティなので同じ長さのアニメーションを重ね、移動の進み具合に
+     比例してゆるやかに小さく・薄くなる。ゆったり優雅に約3.2秒かける。 */
+  animation:
+    swallow-move 3.2s linear forwards,
+    swallow-fade 3.2s linear forwards;
+  animation-delay:.35s, .35s;
+}
+@keyframes swallow-move{
+  0%{ translate:0 0; rotate:-4deg; }
+  100%{ translate:112vw -72vh; rotate:8deg; }
+}
+@keyframes swallow-fade{
+  0%{ opacity:0; scale:1; }
+  8%{ opacity:.96; scale:.98; }
+  70%{ opacity:.8; scale:.52; }
+  100%{ opacity:0; scale:.26; }
+}
+
+/* 右上(燕の飛び去った先)を起点に光が画面を満たす */
+.opening-light{
+  position:absolute; inset:0;
+  z-index:3;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 88% 8%, #fdf6e3 0%, var(--gold) 30%, var(--terracotta-soft) 62%, transparent 100%);
+  clip-path: circle(0% at 88% 8%);
+}
+.opening-overlay.is-flooding .opening-light{
+  animation: opening-light-flood 1.6s cubic-bezier(.3,.6,.3,1) forwards;
+}
+@keyframes opening-light-flood{
+  from{ clip-path: circle(0% at 88% 8%); }
+  to{ clip-path: circle(150% at 88% 8%); }
+}
+@media (max-width:640px){
+  .opening-start .ost-label{ font-size:10px; }
+}
+
+/* ==========================================================================
+   11. レスポンシブ
+   ========================================================================== */
+@media (max-width:820px){
+  nav.main-nav{ gap:14px; }
+  .service-block, .service-block:nth-of-type(even){
+    grid-template-columns:1fr;
+    direction:ltr;
+  }
+  .service-visual{ width:min(60vw,220px); margin:0 auto; }
+  .progress-ui{ display:none; }
+  .handshake-art{ width:70vw; opacity:calc(var(--progress) * 0.5); }
+}
+@media (max-width:480px){
+  header.site-header{ padding:14px 18px; }
+  nav.main-nav a{ font-size:10px; }
+  .section{ padding-left:20px; padding-right:20px; }
+}
+</style>
+</head>
+<body data-theme="dark">
+
+<!-- ============ オープニング演出(全画面オーバーレイ) ============
+     「サイトを開く」ボタン → 1羽の燕が左下から右上へゆったり飛び去る →
+     右上を起点に光が画面を満たす → オーバーレイがフェードアウトして本編へ。
+     prefers-reduced-motion では即座にスキップ。JS無効時は <noscript> で
+     オーバーレイごと非表示にし、常設のホームページのみを表示する。 -->
+<div class="opening-overlay" id="openingOverlay">
+  <div class="opening-stage">
+    <button type="button" class="opening-start" id="openingStart">
+      <span class="ost-label">サイトを開く</span>
+      <span class="ost-circle">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 4 V20 M6 14 L12 20 L18 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </button>
+  </div>
+  <!-- 燕アイコン: "Swallow" by Delapouite (game-icons.net) / CC BY 3.0。座標は無変更 -->
+  <div class="opening-swallow" id="openingSwallow" aria-hidden="true">
+    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+      <path fill="var(--gold)" d="M96.18 22.49C264.6 98.36 403.1 214.8 40.11 270.5 153 268 191.6 291.1 64.12 382.6c230.18-128 331.68-189 318.98 106.9 30.5-54.4 114.6-241 36.4-268.3 6.2-7.4 15.5-19.4 22.1-31.9 13.1-5.7 22.6-13.6 30.3-23.7-8.7-2-16-2.5-22.8-2.3-.2-2.8-.8-5.5-2.1-7.9-8.7-16.5-48.1-13.7-62.4-12.1 4.7-81-226.8-117.09-288.42-120.81z"/>
+    </svg>
+  </div>
+  <div class="opening-light" id="openingLight" aria-hidden="true"></div>
+</div>
+<script>
+  /* reduced-motion のユーザーには演出そのものを見せない。
+     他のJSより先に同期実行し、初回ペイント前にオーバーレイを消す。 */
+  (function(){
+    try{
+      if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+        var el = document.getElementById('openingOverlay');
+        if(el){ el.style.display = 'none'; }
+      }
+    }catch(e){}
+  })();
+</script>
+<noscript><style>.opening-overlay{ display:none !important; }</style></noscript>
+
+<!-- 背景レイヤー -->
+<div class="bg-fixed" aria-hidden="true">
+  <div class="bg-dark"></div>
+  <div class="bg-light"></div>
+  <div class="particles">
+    <div class="particle-layer" style="--depth:0.10; --pdrift:-18px; --preact:0.16; --blur:1.1px;">
+      <span class="particle" style="top:12%;  left:8%;  width:3px; height:3px; --drift-dur:15s; --drift-delay:0s;   --tw-dur:3.2s; --tw-delay:.1s;"></span>
+      <span class="particle" style="top:22%;  left:82%; width:5px; height:5px; --drift-dur:17s; --drift-delay:2s;   --tw-dur:4.6s; --tw-delay:.9s;"></span>
+      <span class="particle" style="top:65%;  left:18%; width:4px; height:4px; --drift-dur:13s; --drift-delay:4s;   --tw-dur:3.8s; --tw-delay:1.4s;"></span>
+      <span class="particle" style="top:40%;  left:55%; width:2px; height:2px; --drift-dur:19s; --drift-delay:1s;   --tw-dur:5.1s; --tw-delay:.3s;"></span>
+      <span class="particle" style="top:78%;  left:70%; width:5px; height:5px; --drift-dur:14s; --drift-delay:6s;   --tw-dur:3.4s; --tw-delay:2.2s;"></span>
+      <span class="particle" style="top:8%;   left:45%; width:3px; height:3px; --drift-dur:16s; --drift-delay:3s;   --tw-dur:4.1s; --tw-delay:.6s;"></span>
+      <span class="particle" style="top:55%;  left:90%; width:5px; height:5px; --drift-dur:18s; --drift-delay:5s;   --tw-dur:5.5s; --tw-delay:1.9s;"></span>
+      <span class="particle" style="top:88%;  left:30%; width:4px; height:4px; --drift-dur:12s; --drift-delay:7s;   --tw-dur:3.9s; --tw-delay:2.6s;"></span>
+      <span class="particle" style="top:33%;  left:12%; width:2px; height:2px; --drift-dur:20s; --drift-delay:2.5s; --tw-dur:4.4s; --tw-delay:1.1s;"></span>
+      <span class="particle" style="top:70%;  left:48%; width:5px; height:5px; --drift-dur:15s; --drift-delay:8s;   --tw-dur:3.6s; --tw-delay:.4s;"></span>
+      <span class="particle" style="top:15%;  left:65%; width:3px; height:3px; --drift-dur:17s; --drift-delay:4.5s; --tw-dur:5.2s; --tw-delay:1.7s;"></span>
+      <span class="particle" style="top:48%;  left:78%; width:5px; height:5px; --drift-dur:13s; --drift-delay:9s;   --tw-dur:4s;   --tw-delay:2.9s;"></span>
+    </div>
+    <div class="particle-layer" style="--depth:0.22; --pdrift:-46px; --preact:0.44; --blur:0.5px;">
+      <span class="particle" style="top:5%;   left:24%; width:6px; height:6px; --drift-dur:11s; --drift-delay:.6s;  --tw-dur:2.8s; --tw-delay:0s;"></span>
+      <span class="particle" style="top:18%;  left:60%; width:2px; height:2px; --drift-dur:16s; --drift-delay:2.2s; --tw-dur:3.3s; --tw-delay:.5s;"></span>
+      <span class="particle" style="top:29%;  left:92%; width:3px; height:3px; --drift-dur:12s; --drift-delay:3.7s; --tw-dur:4.7s; --tw-delay:1.2s;"></span>
+      <span class="particle" style="top:44%;  left:6%;  width:4px; height:4px; --drift-dur:14s; --drift-delay:1.1s; --tw-dur:3.5s; --tw-delay:1.8s;"></span>
+      <span class="particle" style="top:58%;  left:36%; width:2px; height:2px; --drift-dur:18s; --drift-delay:5.4s; --tw-dur:5.8s; --tw-delay:.2s;"></span>
+      <span class="particle" style="top:62%;  left:58%; width:6px; height:6px; --drift-dur:10s; --drift-delay:.3s;  --tw-dur:2.6s; --tw-delay:2.4s;"></span>
+      <span class="particle" style="top:74%;  left:84%; width:3px; height:3px; --drift-dur:15s; --drift-delay:6.6s; --tw-dur:4.2s; --tw-delay:1.5s;"></span>
+      <span class="particle" style="top:81%;  left:14%; width:4px; height:4px; --drift-dur:13s; --drift-delay:2.9s; --tw-dur:3.7s; --tw-delay:.8s;"></span>
+      <span class="particle" style="top:92%;  left:66%; width:2px; height:2px; --drift-dur:19s; --drift-delay:8.1s; --tw-dur:5.4s; --tw-delay:2.1s;"></span>
+      <span class="particle" style="top:37%;  left:76%; width:5px; height:5px; --drift-dur:11s; --drift-delay:4.3s; --tw-dur:3s;   --tw-delay:1s;"></span>
+      <span class="particle" style="top:9%;   left:48%; width:3px; height:3px; --drift-dur:17s; --drift-delay:7.4s; --tw-dur:4.9s; --tw-delay:.4s;"></span>
+      <span class="particle" style="top:51%;  left:20%; width:2px; height:2px; --drift-dur:14s; --drift-delay:1.7s; --tw-dur:3.4s; --tw-delay:2.7s;"></span>
+    </div>
+    <div class="particle-layer" style="--depth:0.4; --pdrift:-84px; --preact:0.85; --blur:0.15px;">
+      <span class="particle is-star" style="top:14%; left:38%; width:9px;  height:9px;  --drift-dur:9s;  --drift-delay:.2s;  --tw-dur:2.4s; --tw-delay:0s;"></span>
+      <span class="particle is-star" style="top:26%; left:70%; width:7px;  height:7px;  --drift-dur:8s;  --drift-delay:1.5s; --tw-dur:2.1s; --tw-delay:.7s;"></span>
+      <span class="particle is-star" style="top:46%; left:10%; width:8px;  height:8px;  --drift-dur:10s; --drift-delay:2.8s; --tw-dur:2.7s; --tw-delay:1.3s;"></span>
+      <span class="particle is-star" style="top:68%; left:46%; width:10px; height:10px; --drift-dur:9s;  --drift-delay:.9s;  --tw-dur:2.3s; --tw-delay:1.9s;"></span>
+      <span class="particle is-star" style="top:83%; left:80%; width:7px;  height:7px;  --drift-dur:11s; --drift-delay:3.6s; --tw-dur:2.9s; --tw-delay:.4s;"></span>
+      <span class="particle is-star" style="top:6%;  left:88%; width:8px;  height:8px;  --drift-dur:8s;  --drift-delay:4.4s; --tw-dur:2.2s; --tw-delay:2.5s;"></span>
+    </div>
+    <!-- JS有効時はこのCanvasが粒子を描く(上のCSS粒子はreduced-motion/JS無効時の代替) -->
+    <canvas class="particle-canvas" id="particleCanvas" aria-hidden="true"></canvas>
+  </div>
+
+  <!-- 星屑が細い光の軌跡に沿って静かに流れていく演出(肉眼にほぼ見えない淡いパス+その上を動く光点) -->
+  <div class="star-trails" aria-hidden="true">
+    <!-- preserveAspectRatio は "slice"(均一拡大縮小)にする。"none" で伸縮させると
+         光点の円が楕円につぶれて見えるため、円形を保てる方式に統一している。 -->
+    <svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
+      <defs>
+        <radialGradient id="trail-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#d8c48f" stop-opacity="1"/>
+          <stop offset="70%" stop-color="#d8c48f" stop-opacity=".5"/>
+          <stop offset="100%" stop-color="#d8c48f" stop-opacity="0"/>
+        </radialGradient>
+        <path id="trail-path-1" d="M6,14 C 42,4 77,22 112,10 S 158,4 158,4" fill="none"/>
+        <path id="trail-path-2" d="M3,72 C 45,56 74,84 109,64 S 154,58 157,66" fill="none"/>
+        <path id="trail-path-3" d="M19,46 C 48,32 80,50 106,38 S 141,30 154,40" fill="none"/>
+      </defs>
+      <!-- パス本体はうっすら光る軌跡としてだけ見える程度に抑える -->
+      <use href="#trail-path-1" stroke="#d8c48f" stroke-width=".12" stroke-opacity=".22"/>
+      <use href="#trail-path-2" stroke="#d8c48f" stroke-width=".1"  stroke-opacity=".16"/>
+      <use href="#trail-path-3" stroke="#d8c48f" stroke-width=".1"  stroke-opacity=".14"/>
+
+      <circle r="1.3" fill="url(#trail-glow)">
+        <animateMotion dur="34s" repeatCount="indefinite" rotate="auto" keyPoints="0;1" keyTimes="0;1" calcMode="linear">
+          <mpath href="#trail-path-1"/>
+        </animateMotion>
+      </circle>
+      <circle r=".8" fill="url(#trail-glow)">
+        <animateMotion dur="46s" begin="-9s" repeatCount="indefinite" rotate="auto" keyPoints="0;1" keyTimes="0;1" calcMode="linear">
+          <mpath href="#trail-path-2"/>
+        </animateMotion>
+      </circle>
+      <circle r="1" fill="url(#trail-glow)">
+        <animateMotion dur="40s" begin="-21s" repeatCount="indefinite" rotate="auto" keyPoints="0;1" keyTimes="0;1" calcMode="linear">
+          <mpath href="#trail-path-3"/>
+        </animateMotion>
+      </circle>
+      <circle r=".65" fill="url(#trail-glow)">
+        <animateMotion dur="34s" begin="-24s" repeatCount="indefinite" rotate="auto" keyPoints="0;1" keyTimes="0;1" calcMode="linear">
+          <mpath href="#trail-path-1"/>
+        </animateMotion>
+      </circle>
+    </svg>
+  </div>
+
+  <div class="handshake-art">
+    <svg viewBox="0 0 400 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- 握手アイコン(Material Design Icons由来のパスを使用。Apache-2.0ライセンスで商用利用可) -->
+      <g transform="translate(160,70) scale(5)" fill="#b3593a" stroke="none">
+        <path d="M11 6H14L17.29 2.7A1 1 0 0 1 18.71 2.7L21.29 5.29A1 1 0 0 1 21.29 6.7L19 9H11V11A1 1 0 0 1 10 12A1 1 0 0 1 9 11V8A2 2 0 0 1 11 6M5 11V15L2.71 17.29A1 1 0 0 0 2.71 18.7L5.29 21.29A1 1 0 0 0 6.71 21.29L11 17H15A1 1 0 0 0 16 16V15H17A1 1 0 0 0 18 14V13H19A1 1 0 0 0 20 12V11H13V12A2 2 0 0 1 11 14H9A2 2 0 0 1 7 12V9Z"/>
+      </g>
+      <circle cx="60" cy="70" r="2" fill="#d8c48f"/>
+      <circle cx="340" cy="60" r="1.6" fill="#d8c48f"/>
+      <circle cx="200" cy="40" r="1.4" fill="#d8c48f"/>
+    </svg>
+  </div>
+</div>
+
+<header class="site-header">
+  <a class="logo" href="#top"><span>Re</span> / Mental health for Challengers</a>
+  <nav class="main-nav">
+    <a href="#top">TOP</a>
+    <a href="#news">NEWS</a>
+    <a href="#contact">CONTACT</a>
+  </nav>
+</header>
+
+<div class="progress-ui" aria-hidden="true">
+  <div class="count"><span class="cur">00</span> / 06</div>
+  <div class="label" data-label>PROLOGUE</div>
+  <div class="track"><em style="--dot-y:0px"></em></div>
+</div>
+
+<main id="top">
+
+  <!-- ============ INTRO(通常フロー内。JS無効でもそのまま読める) ============ -->
+  <section class="intro">
+    <p class="kanban">Re Corporate Site — Renewal Concept</p>
+    <h1>
+      何度でも、羽ばたける社会を。
+      <small>Mental health for Challengers</small>
+    </h1>
+    <a class="enter-link" href="#hero">
+      はじめる
+      <span class="circle">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 4 V20 M6 14 L12 20 L18 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </a>
+  </section>
+
+  <!-- ============ 00 HERO ============ -->
+  <section class="section hero" id="hero" data-index="0" data-label="PROLOGUE">
+    <div class="section-inner">
+      <p class="chapter-no fall-in" style="--fall-delay:0;">PROLOGUE — 挑戦の入り口で</p>
+      <h1 class="headline fall-in" style="--fall-delay:90;">挑戦する人の<br>メンタルヘルスを、<br><em>もうひとつの経営基盤</em>に。</h1>
+      <p class="sub fall-in" style="--fall-delay:220;">Re株式会社は、知識と実践を往復させながら&#8203;<br>大きな空へ向かう挑戦に、経営とこころの両面から伴走する専門家集団です。</p>
+    </div>
+    <div class="scroll-cue">
+      <span>scroll</span>
+      <span class="line"></span>
+    </div>
+  </section>
+
+  <!-- ============ 01–03 SERVICES ============ -->
+  <section class="section services-wrap" id="services" data-index="1" data-label="CHAPTER I — SERVICE">
+    <div class="section-inner">
+      <p class="eyebrow fall-in">CHAPTER I — 事業内容</p>
+
+      <div class="service-block" data-index="1" data-label="研修">
+        <div class="service-visual">
+          <span class="service-index">01</span>
+          <svg viewBox="0 0 120 120" fill="none">
+            <path d="M20 90 C 30 60, 50 40, 60 20" stroke="var(--text-dim)" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M35 95 C 45 65, 62 42, 78 25" stroke="var(--accent)" stroke-width="1.2" stroke-linecap="round"/>
+            <circle cx="60" cy="20" r="3" fill="var(--accent)"/>
+            <path d="M20 100 L100 100" stroke="var(--text-faint)" stroke-width="1"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="service-title fall-in"><small>KNOWLEDGE × PRACTICE</small>知識を、実践に変える。</h3>
+          <p class="service-desc fall-in" style="--fall-delay:80;">座学だけで終わらせない、ワークショップ形式のメンタルヘルス研修です。心理学・組織行動学の知見を土台に、実際の職場で起きている出来事をその場で扱いながら、明日から使える対応力を育てます。</p>
+          <p class="service-desc fall-in" style="--fall-delay:160;">対象は経営層からマネジメント層まで。「知っている」を「できる」に変える実践設計が特徴です。</p>
+        </div>
+      </div>
+
+      <div class="service-block" data-index="2" data-label="1on1">
+        <div class="service-visual">
+          <span class="service-index">02</span>
+          <svg viewBox="0 0 120 120" fill="none">
+            <circle cx="45" cy="50" r="16" stroke="var(--text-dim)" stroke-width="1.2"/>
+            <circle cx="75" cy="70" r="16" stroke="var(--accent)" stroke-width="1.2"/>
+            <path d="M58 55 L 62 65" stroke="var(--text-faint)" stroke-width="1"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="service-title fall-in"><small>FOR CXO</small>孤独の重さに、輪郭を。</h3>
+          <p class="service-desc fall-in" style="--fall-delay:80;">経営の意思決定は、多くの場合ひとりで背負うものです。Reの1on1支援は、CXOという立場特有の孤独やプレッシャーに寄り添い、対話を通じて思考と感情の整理を行う場を提供します。</p>
+          <p class="service-desc fall-in" style="--fall-delay:160;">守秘義務のもとで行う継続的なセッションが、次の意思決定の質を静かに支えます。</p>
+        </div>
+      </div>
+
+      <div class="service-block" data-index="3" data-label="事業支援">
+        <div class="service-visual">
+          <span class="service-index">03</span>
+          <svg viewBox="0 0 120 120" fill="none">
+            <path d="M20 90 L45 60 L65 75 L100 30" stroke="var(--accent)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="100" cy="30" r="3" fill="var(--text-dim)"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="service-title fall-in"><small>STARTUP / VC / CVC</small>次の空へ、共に飛び立つ。</h3>
+          <p class="service-desc fall-in" style="--fall-delay:80;">スタートアップの創業支援、マーケティング、ファイナンスといった事業面の伴走を行います。VC・CVCの出資先企業に対しても、事業成長とチームの健全性を両輪で支える支援を提供しています。</p>
+          <p class="service-desc fall-in" style="--fall-delay:160;">加えて、月額500円のオンライン座談会「めんたるへるす塾」では、日常的に学び合える場を継続的に開いています。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 02 専門分野 ============ -->
+  <section class="section" id="specialty" data-index="3" data-label="CHAPTER II — SPECIALTY">
+    <div class="section-inner">
+      <p class="eyebrow fall-in">CHAPTER II — 専門分野</p>
+      <h2 class="headline fall-in">三つの現場に、深く根を張る。</h2>
+      <p class="poetic fall-in" style="--fall-delay:120;">こころの専門性は、業界を選ばない。<br>それでも現場ごとに、見える景色は違う。</p>
+
+      <div class="specialty-grid">
+        <div class="specialty-card fall-in" style="--fall-delay:0;">
+          <p class="s-num">01</p>
+          <p class="s-poetic">彼女の強さは、<br>誰にも証明を求めない。</p>
+          <p class="s-tag">WOMEN'S MENTAL HEALTH</p>
+          <p>ライフイベントによるホルモン変化、キャリアと家庭の両立、周囲に相談しづらい不調——女性特有の悩みは、一般的なメンタルヘルス研修だけでは拾いきれません。産婦人科領域の知見と組織支援の実務を組み合わせ、女性が自分の状態を正しく言葉にできる環境づくりを支援します。</p>
+        </div>
+        <div class="specialty-card fall-in" style="--fall-delay:90;">
+          <p class="s-num">02</p>
+          <p class="s-poetic">組織の不調は、<br>ひとりの弱さではない。</p>
+          <p class="s-tag">CORPORATE / ORGANIZATIONAL MENTAL HEALTH</p>
+          <p>離職・休職・生産性の低下は、個人の問題として処理されがちですが、多くは組織構造や関係性のひずみに起因します。ストレスチェックの数値化にとどまらず、意思決定層への1on1支援と現場研修を両輪で行い、組織としてのメンタルヘルスを設計します。</p>
+        </div>
+        <div class="specialty-card fall-in" style="--fall-delay:180;">
+          <p class="s-num">03</p>
+          <p class="s-poetic">はじめての社会人生活に、<br>羅針盤を。</p>
+          <p class="s-tag">NEW EMPLOYEE TRAINING</p>
+          <p>入社直後は、期待と不安が最も大きく揺れ動く時期です。リアリティショックへの向き合い方、報連相のこころ理学的な設計、早期離職を防ぐための1on1の作法まで、新人自身とその育成者の双方に向けた実践型プログラムを提供しています。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 04 実績 ============ -->
+  <section class="section" id="works" data-index="4" data-label="CHAPTER III — TRUST">
+    <div class="section-inner">
+      <p class="eyebrow fall-in">CHAPTER III — 実績と信頼</p>
+      <h2 class="headline fall-in">歩みは、静かに積み重なっている。</h2>
+      <p class="poetic fall-in" style="--fall-delay:120;">ひとつひとつの現場での対話が、<br>やがて社会の側に置く言葉になっていく。</p>
+
+      <div class="credentials">
+        <div class="credential fall-in" style="--fall-delay:0;">
+          <p class="tag">MEDIA</p>
+          <h3>NHK「おはよう日本」にて取材掲載</h3>
+          <p>挑戦する人のメンタルヘルスというテーマが全国放送で取り上げられ、経営とこころの両立という視点が社会に共有されました。</p>
+        </div>
+        <div class="credential fall-in" style="--fall-delay:90;">
+          <p class="tag">EDUCATION</p>
+          <h3>清泉大学短期大学部でワークショップを開催</h3>
+          <p>教育機関との連携により、若い世代に向けたメンタルヘルスの実践的な学びの場を提供しています。</p>
+        </div>
+        <div class="credential fall-in" style="--fall-delay:180;">
+          <p class="tag">COMMUNITY</p>
+          <h3>オンライン座談会「めんたるへるす塾」</h3>
+          <p>月額500円で参加できる継続的な学びの場。経営者・実務者が垣根を越えて対話を重ねています。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 05 安心の運用サポート ============ -->
+  <section class="section" id="support" data-index="5" data-label="CHAPTER IV — SUPPORT">
+    <div class="section-inner">
+      <p class="eyebrow fall-in">CHAPTER IV — 安心の運用サポート</p>
+      <h2 class="headline fall-in">手を、離さない。</h2>
+      <p class="poetic fall-in" style="--fall-delay:120;">サイトも、こころと同じように&#8203;<br>整えながら育てていくものだと考えています。</p>
+
+      <div class="support-grid">
+        <div class="support-card fall-in" style="--fall-delay:0;">
+          <p class="num">01</p>
+          <h3>むずかしい操作はありません</h3>
+          <p>お知らせの更新は、専門知識がなくても迷わない管理画面をご用意します。手順書も平易な言葉で作成し、操作に困ったときはこちらでいつでもサポートします。</p>
+        </div>
+        <div class="support-card fall-in" style="--fall-delay:90;">
+          <p class="num">02</p>
+          <h3>写真は、鍵のかかる場所に</h3>
+          <p>ニュースリリースに使う写真は、専用の保管場所でまとめて管理します。誰が・いつ・何をアップロードしたかが分かる仕組みにし、迷子にならないようにします。</p>
+        </div>
+        <div class="support-card fall-in" style="--fall-delay:180;">
+          <p class="num">03</p>
+          <h3>パスワードのルールを、先にお渡しします</h3>
+          <p>管理画面やパスワードの取り扱いについて、専門用語を使わないガイドラインを事前にご用意します。定期的な見直しの時期もこちらからお知らせします。</p>
+        </div>
+      </div>
+
+      <p class="support-note fall-in">
+        「更新のたびに不安になる」を、なくしたい。<br>
+        運用が始まったあとこそ、私たちの本番だと考えています。
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 06 CONTACT ============ -->
+  <section class="section contact-section" id="contact" data-index="6" data-label="EPILOGUE — CONTACT">
+    <div class="section-inner">
+      <p class="eyebrow fall-in" style="justify-content:center;">EPILOGUE</p>
+      <h2 class="headline fall-in">まずは、話すところから。</h2>
+      <p class="poetic fall-in" style="margin-left:auto;margin-right:auto; --fall-delay:120;">研修のご相談も、1on1のご相談も、事業支援のご相談も。<br>小さな違和感の段階から、お気軽にお声がけください。</p>
+      <div class="contact-cta">
+        <a class="btn" href="mailto:info@re-example.co.jp">お問い合わせはこちら</a>
+        <p class="contact-meta">RECEPTION HOURS — MON–FRI 10:00–18:00<br>通常1〜2営業日以内にご返信いたします</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer id="news">
+  <div>
+    <p class="f-logo">Re, Inc.</p>
+    <p class="f-meta">代表取締役 小林 宣文<br>Mental health for Challengers</p>
+  </div>
+  <nav class="f-nav">
+    <a href="#top">TOP</a>
+    <a href="#services">SERVICE</a>
+    <a href="#contact">CONTACT</a>
+  </nav>
+  <p class="f-meta">&copy; 2026 Re, Inc. All Rights Reserved.</p>
+</footer>
+
+<script>
+/* ---- オープニング演出:ボタン→鳥の大群→右上から光→ホームページへ ---- */
+(function(){
+  "use strict";
+  var overlay = document.getElementById('openingOverlay');
+  if(!overlay) return;
+
+  // 万一、上の同期スクリプトより先にここへ来た場合に備えて再度判定しておく
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(reduced){
+    overlay.style.display = 'none';
+    return;
+  }
+
+  var startBtn = document.getElementById('openingStart');
+  var htmlEl = document.documentElement;
+
+  /* タイムライン(クリック時点を 0s とする):
+       0s      ボタンが縮む(押した手応え)+文字がフェードアウト
+       0.35s   燕が左下から飛び立つ(3.2s かけて一定速度で右上へ。徐々に小さく・薄く)
+       2.7s    燕が右上に消えかかる頃、右上から gold の光が広がり始める(1.6s)
+       4.4s    光が満ちたらオーバーレイをフェードアウトして本編へ           */
+  var launched = false;
+  function launch(){
+    if(launched) return;
+    launched = true;
+
+    startBtn.classList.add('is-pressed');   // 押した瞬間のフィードバック(縮小)
+    htmlEl.style.overflow = 'hidden';
+    overlay.classList.add('is-launching');  // 文字が消え、燕のアニメーションが始まる
+
+    window.setTimeout(function(){
+      overlay.classList.add('is-flooding'); // 右上から光が満ちる
+    }, 2700);
+
+    window.setTimeout(function(){
+      overlay.classList.add('is-done');     // オーバーレイ全体をフェードアウト
+      htmlEl.style.overflow = '';
+      window.setTimeout(function(){
+        overlay.setAttribute('hidden', '');
+      }, 950);
+    }, 4400);
+  }
+
+  if(startBtn){
+    startBtn.addEventListener('click', launch, { once:true });
+  }
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var root = document.documentElement;
+  var body = document.body;
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---- 1. スクロール進度 → --progress(rAFで間引き) ----
+     全体のスクロール量ではなく「安心の運用サポート」セクションの
+     出現位置を基準にする。ここに到達するまでは確実に暗い(夜明け前)まま、
+     このセクションを通過する間だけ連続的に明るい(握手の場面)へ変化する。 */
+  var ticking = false;
+  var supportEl = document.getElementById('support');
+  function smoothstep(edge0, edge1, x){
+    var t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
+    return t * t * (3 - 2 * t);
+  }
+  function updateProgress(){
+    var eased = 0;
+    if(supportEl){
+      var rect = supportEl.getBoundingClientRect();
+      var vh = window.innerHeight;
+      // rect.top が画面下端に来た時点で 0、セクション上端が画面中央付近まで
+      // スクロールし終える頃に 1 になるよう正規化する
+      var raw = (vh - rect.top) / (vh * 0.9);
+      eased = smoothstep(0.0, 1.0, raw);
+    }
+    root.style.setProperty('--progress', eased.toFixed(4));
+    // 背景の明暗と文字色のテーマは必ず同じ基準(この progress)で切り替える。
+    // 閾値をずらすと「明るい背景に白文字」のような可読性事故が起きるため統一する。
+    body.setAttribute('data-theme', eased >= 0.5 ? 'light' : 'dark');
+    ticking = false;
+  }
+  window.addEventListener('scroll', function(){
+    if(!ticking){
+      window.requestAnimationFrame(updateProgress);
+      ticking = true;
+    }
+  }, { passive:true });
+  updateProgress();
+
+  /* ---- 1c. マウス連動の奥行き視差 ----
+     画面中央からのマウス位置のズレ(x, y)を --mx / --my として root に反映する。
+     transformのみを動かすCSS側(.particle-layer, .handshake-art)が
+     depth(手前ほど大きく・奥ほど小さく)を掛けて視差を作る。
+     rAFで間引き、タッチデバイス・prefers-reduced-motionでは無効化する。 */
+  var isTouch = window.matchMedia("(pointer: coarse)").matches;
+  if(!reduced && !isTouch){
+    var mouseTicking = false;
+    var lastMX = 0, lastMY = 0;
+    window.addEventListener('mousemove', function(e){
+      var cx = window.innerWidth / 2;
+      var cy = window.innerHeight / 2;
+      lastMX = ((e.clientX - cx) / cx) * 18; // 最大 ±18px 分の視差
+      lastMY = ((e.clientY - cy) / cy) * 18;
+      if(!mouseTicking){
+        window.requestAnimationFrame(function(){
+          root.style.setProperty('--mx', lastMX.toFixed(2) + 'px');
+          root.style.setProperty('--my', lastMY.toFixed(2) + 'px');
+          mouseTicking = false;
+        });
+        mouseTicking = true;
+      }
+    }, { passive:true });
+  }
+
+  /* ---- 2. セクション観測 → 進行度UI(00/06・章タイトル)の更新のみ ----
+     文字色テーマの切替は updateProgress() 側の --progress に一本化済み。
+     ここで二重に data-theme を切り替えると背景と文字色の基準がずれ、
+     明るい背景に白文字が乗るような可読性事故につながるため触らない。 */
+  var sections = Array.prototype.slice.call(document.querySelectorAll('.section[data-index]'));
+  var curEl = document.querySelector('.progress-ui .cur');
+  var labelEl = document.querySelector('.progress-ui [data-label]');
+  var dotEl = document.querySelector('.progress-ui .track em');
+  var trackHeight = 64;
+
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting && entry.intersectionRatio > 0.4){
+          var idx = parseInt(entry.target.getAttribute('data-index'), 10);
+          var label = entry.target.getAttribute('data-label') || '';
+          if(curEl) curEl.textContent = String(idx).padStart(2,'0');
+          if(labelEl) labelEl.textContent = label;
+          if(dotEl) dotEl.style.setProperty('--dot-y', (idx/6*trackHeight) + 'px');
+        }
+      });
+    }, { threshold:[0.4, 0.6] });
+    sections.forEach(function(s){ io.observe(s); });
+  }
+
+  /* ---- 3. 文章ブロックの落下アニメーション ----
+     上から少し落ちてきて着地する演出。IntersectionObserver未対応や
+     reduced-motionのときは body.js-fall を付けないため、常に通常表示のまま
+     (CSS側の .fall-in はデフォルトで opacity:1 / transform:none)。
+     要素ごとに --fall-delay(ms)をHTML側で振ってstaggerさせる。 */
+  if('IntersectionObserver' in window && !reduced){
+    body.classList.add('js-fall');
+    var fallEls = Array.prototype.slice.call(document.querySelectorAll('.fall-in'));
+    var fallIo = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('is-visible');
+          fallIo.unobserve(entry.target);
+        }
+      });
+    }, { threshold:0.2, rootMargin:'0px 0px -8% 0px' });
+    fallEls.forEach(function(el){ fallIo.observe(el); });
+  }
+})();
+</script>
+
+<script>
+/* ---- 光の粒子(Canvas 2D・外部ライブラリなし) ----
+   sin/cosを重ねた擬似パーリンノイズの流れ場に沿って、粒子が群れのように
+   ゆるやかに泳ぐ。マウスが近づくと静かに避け、奥行き(z)で大きさ・明るさ・
+   速さを変える。reduced-motion では起動せず、静的なCSS粒子が表示される。 */
+(function(){
+  "use strict";
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var canvas = document.getElementById('particleCanvas');
+  if(reduced || !canvas || !canvas.getContext) return;
+  var ctx = canvas.getContext('2d');
+  if(!ctx) return;
+  document.body.classList.add('js-canvas');
+
+  var W = 0, H = 0, dpr = 1;
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width  = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize, { passive:true });
+
+  /* マウス(タッチ端末では無効のまま = 画面外扱い) */
+  var isTouch = window.matchMedia("(pointer: coarse)").matches;
+  var mx = -1e5, my = -1e5;
+  if(!isTouch){
+    window.addEventListener('mousemove', function(e){ mx = e.clientX; my = e.clientY; }, { passive:true });
+    document.addEventListener('mouseleave', function(){ mx = -1e5; my = -1e5; });
+  }
+
+  /* 粒子の生成(奥行き z: 0=奥 〜 1=手前) */
+  var COUNT = (W < 700) ? 110 : 170;
+  var particles = [];
+  for(var i = 0; i < COUNT; i++){
+    var z = Math.pow(Math.random(), 1.6); // 奥を多めに
+    particles.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: 0, vy: 0,
+      z: z,
+      phase: Math.random() * Math.PI * 2,
+      twSpeed: 0.6 + Math.random() * 1.4
+    });
+  }
+
+  /* 擬似パーリンノイズ:周波数の違うsin/cosを3層重ねた滑らかな流れ場 */
+  function flowAngle(x, y, t){
+    return (
+      Math.sin(x * 0.0016 + t * 0.00021) * 1.35 +
+      Math.cos(y * 0.0014 - t * 0.00016) * 1.35 +
+      Math.sin((x + y) * 0.0007 + t * 0.00009) * 0.8
+    );
+  }
+
+  var GOLD = '216,196,143';
+  var WHITE = '250,246,235';
+  var running = true;
+  document.addEventListener('visibilitychange', function(){
+    running = !document.hidden;
+    if(running) window.requestAnimationFrame(tick);
+  });
+
+  var MARGIN = 24;
+  function tick(t){
+    if(!running) return;
+    ctx.clearRect(0, 0, W, H);
+
+    for(var i = 0; i < particles.length; i++){
+      var p = particles[i];
+      var speed = 0.14 + p.z * 0.42;            // 手前ほど速い
+      var a = flowAngle(p.x, p.y, t);
+      var tx = Math.cos(a) * speed;
+      var ty = Math.sin(a) * speed * 0.7 - 0.03; // わずかに上昇気流
+
+      /* マウスからゆるやかに避ける(手前の粒子ほどよく反応) */
+      var dx = p.x - mx, dy = p.y - my;
+      var d2 = dx * dx + dy * dy;
+      var R = 150;
+      if(d2 < R * R){
+        var d = Math.sqrt(d2) || 1;
+        var f = (1 - d / R) * (0.5 + p.z * 0.9) * 0.9;
+        tx += (dx / d) * f;
+        ty += (dy / d) * f;
+      }
+
+      /* 目標速度へ少しずつ寄せる(慣性 = 生き物らしい泳ぎ) */
+      p.vx += (tx - p.vx) * 0.045;
+      p.vy += (ty - p.vy) * 0.045;
+      p.x += p.vx;
+      p.y += p.vy;
+
+      /* 画面端はループ */
+      if(p.x < -MARGIN) p.x = W + MARGIN;
+      if(p.x >  W + MARGIN) p.x = -MARGIN;
+      if(p.y < -MARGIN) p.y = H + MARGIN;
+      if(p.y >  H + MARGIN) p.y = -MARGIN;
+
+      /* 瞬き(ゆっくり明滅)+奥行きで基礎輝度を変える */
+      var tw = 0.62 + 0.38 * Math.sin(t * 0.001 * p.twSpeed + p.phase);
+      var alpha = (0.10 + p.z * 0.42) * tw;
+      var r = 0.5 + p.z * 1.9;
+
+      /* 手前の粒子には淡いハロー(gold)を重ねて微光にする */
+      if(p.z > 0.55){
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(' + GOLD + ',' + (alpha * 0.22).toFixed(3) + ')';
+        ctx.arc(p.x, p.y, r * 3.2, 0, 6.2832);
+        ctx.fill();
+      }
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(' + (p.z > 0.8 ? WHITE : GOLD) + ',' + alpha.toFixed(3) + ')';
+      ctx.arc(p.x, p.y, r, 0, 6.2832);
+      ctx.fill();
+    }
+    window.requestAnimationFrame(tick);
+  }
+  window.requestAnimationFrame(tick);
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Re株式会社 | Mental health for Challengers(デザイン案G:思想を語るジャーナル)</title>
+<meta name="description" content="挑戦する人のメンタルヘルス。知識×実践型研修、CXO向け1on1支援、事業支援を行うRe株式会社のコーポレートサイト(デザイン案G:編集誌風ジャーナル。粒子演出はヒーローのみ、本体は思想を語る誌面レイアウト)">
+<style>
+/* ==========================================================================
+   0. 基本設定
+   ========================================================================== */
+:root{
+  /* 紙面(本体)パレット。純白・純黒を避け、温かみのある近白・近黒にする */
+  --paper-0:#f7f2e6;
+  --paper-1:#efe8d6;
+  --paper-line:rgba(34,28,18,0.14);
+  --ink:#221d16;
+  --ink-dim:rgba(34,29,22,0.66);
+  --ink-faint:rgba(34,29,22,0.38);
+
+  /* ヒーロー専用の夜空パレット(オープニング演出と揃える) */
+  --navy-0:#080a14;
+  --navy-1:#10142a;
+  --navy-2:#1b2242;
+  --sky-light:#e9dfc2;
+  --ink-light:#f4f1e8;
+  --ink-light-dim:rgba(244,241,232,0.66);
+  --ink-light-faint:rgba(244,241,232,0.34);
+
+  --accent:#9c5a34;      /* テラコッタ寄りのブロンズ。彩度を抑える */
+  --accent-soft:#c68a5e;
+  --gold:#d8c48f;
+  --glow-rgb:156,90,52;   /* 紙面上のホバーグロー(ブロンズ) */
+  --glow-rgb-dark:216,196,143; /* ヒーロー(暗色)上のホバーグロー(ゴールド) */
+
+  --serif:"Yu Mincho","YuMincho","Hiragino Mincho ProN","Times New Roman",serif;
+  --mono:"Courier New", ui-monospace, monospace;
+  --sans:"Hiragino Kaku Gothic ProN","Yu Gothic","Segoe UI",sans-serif;
+}
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0;
+  font-family:var(--sans);
+  background:var(--paper-0);
+  color:var(--ink);
+  overflow-x:hidden;
+}
+img,svg{ max-width:100%; display:block; }
+a{ color:inherit; text-decoration:none; }
+h1,h2,h3,p{ margin:0; }
+button{ font-family:inherit; }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.2s !important; scroll-behavior:auto !important; }
+}
+
+/* ==========================================================================
+   1. 文章ホバー時の光(誌面の落ち着きを保つ、控えめなグロー/アンダーライン光)
+   ========================================================================== */
+@media (hover:hover) and (pointer:fine){
+  .headline, .lede, .body-text, .kicker, .pull-quote, .drop-cap-p,
+  .service-title, .service-lede, .work-title, .work-body,
+  .support-card h3, .support-card p, .support-note, .contact-meta,
+  .masthead-tag{
+    transition: text-shadow .5s ease, color .5s ease;
+  }
+  .headline:hover, .lede:hover, .body-text:hover, .kicker:hover, .pull-quote:hover, .drop-cap-p:hover,
+  .service-title:hover, .service-lede:hover, .work-title:hover, .work-body:hover,
+  .support-card:hover h3, .support-card:hover p, .support-note:hover, .contact-meta:hover,
+  .masthead-tag:hover{
+    text-shadow: 0 0 16px rgba(var(--glow-rgb), .30), 0 0 4px rgba(var(--glow-rgb), .18);
+  }
+  /* 段落は光ると同時に明度もわずかに上がる+下線がふわっと灯る */
+  .lede, .body-text, .service-lede, .work-body, .support-card p, .support-note{
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-repeat:no-repeat;
+    background-position: left bottom;
+    background-size: 0% 1px;
+    transition: background-size .5s ease, text-shadow .5s ease, color .5s ease;
+    padding-bottom:2px;
+  }
+  .lede:hover, .body-text:hover, .service-lede:hover, .work-body:hover, .support-card:hover p, .support-note:hover{
+    color:var(--ink);
+    background-size: 100% 1px;
+  }
+  .hero .lede, .hero .lede:hover{ background-image:none; }
+
+  /* 図形(アイコン・装飾)にもホバーで光る反応を付ける。誌面らしく控えめな輝度に留める */
+  .icon-glow{ transition: filter .45s ease, transform .45s ease; }
+  .icon-glow svg *{ transition: stroke .45s ease, fill .45s ease; }
+  .icon-glow:hover{
+    filter: drop-shadow(0 0 8px rgba(var(--glow-rgb), .55)) drop-shadow(0 0 2px rgba(var(--glow-rgb), .4));
+    transform: translateY(-2px);
+  }
+  .icon-glow.on-dark:hover{
+    filter: drop-shadow(0 0 10px rgba(var(--glow-rgb-dark), .65)) drop-shadow(0 0 3px rgba(var(--glow-rgb-dark), .5));
+  }
+}
+@media (prefers-reduced-motion: reduce){
+  .headline,.lede,.body-text,.kicker,.pull-quote,.drop-cap-p,.service-title,.service-lede,.work-title,.work-body,
+  .support-card h3,.support-card p,.support-note,.contact-meta,.masthead-tag,.icon-glow,.icon-glow svg *{ transition:none; }
+}
+
+/* ==========================================================================
+   2. マストヘッド(誌面の題字のようなヘッダー)
+   ========================================================================== */
+header.masthead{
+  position:relative; z-index:20;
+  padding: clamp(18px,3vw,30px) clamp(20px,5vw,64px) clamp(14px,2vw,22px);
+  border-bottom:1px solid var(--paper-line);
+  background:var(--paper-0);
+}
+.masthead-row{
+  display:flex; align-items:flex-end; justify-content:space-between;
+  gap:20px; flex-wrap:wrap;
+  max-width:1240px; margin:0 auto;
+}
+.masthead-brand{ display:flex; align-items:center; gap:14px; }
+.masthead-mark{ display:inline-block; width:30px; height:30px; flex:none; }
+.masthead-mark svg{ width:100%; height:100%; }
+.masthead-title{
+  font-family:var(--serif);
+  font-size:clamp(22px,3vw,30px);
+  letter-spacing:0.18em;
+  color:var(--ink);
+}
+.masthead-tag{
+  display:block;
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:0.24em;
+  color:var(--ink-faint);
+  margin-top:4px;
+}
+nav.masthead-nav{ display:flex; gap:clamp(16px,2.4vw,32px); flex-wrap:wrap; }
+nav.masthead-nav a{
+  font-family:var(--mono);
+  font-size:11.5px;
+  letter-spacing:0.16em;
+  color:var(--ink-dim);
+  position:relative;
+  padding-bottom:4px;
+}
+nav.masthead-nav a::after{
+  content:""; position:absolute; left:0; bottom:0; width:0; height:1px;
+  background:var(--accent); transition:width .3s ease;
+}
+nav.masthead-nav a:hover{ color:var(--ink); }
+nav.masthead-nav a:hover::after{ width:100%; }
+
+/* ==========================================================================
+   3. HERO(粒子演出はここだけ)
+   ========================================================================== */
+.hero{
+  position:relative;
+  min-height:100svh;
+  display:flex; flex-direction:column; justify-content:center;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% 0%, #232c52 0%, transparent 62%),
+    linear-gradient(180deg, var(--navy-0) 0%, var(--navy-1) 58%, var(--navy-2) 100%);
+  color:var(--ink-light);
+  overflow:hidden;
+  padding: clamp(90px,14vh,150px) clamp(20px,6vw,80px) clamp(70px,10vh,110px);
+}
+/* 上へ行くほどほんのり空けて見せる=「視界が開ける」ニュアンス */
+.hero::before{
+  content:"";
+  position:absolute; inset:0; z-index:0; pointer-events:none;
+  background: linear-gradient(180deg, rgba(233,223,194,0.10) 0%, transparent 34%);
+}
+.hero-canvas-wrap{
+  position:absolute; inset:0; z-index:1; pointer-events:none;
+}
+.hero-canvas-wrap canvas{ position:absolute; inset:0; width:100%; height:100%; display:none; }
+body.js-hero-canvas .hero-canvas-wrap canvas{ display:block; }
+/* JS未対応 / reduced-motion 時の静的な代替(控えめな光点をいくつか置くだけ) */
+.hero-static-dots{ position:absolute; inset:0; z-index:1; }
+body.js-hero-canvas .hero-static-dots{ display:none; }
+.hero-static-dots span{
+  position:absolute; border-radius:50%;
+  background:radial-gradient(circle, rgba(216,196,143,0.9) 0%, rgba(216,196,143,0) 70%);
+}
+.hero-content{ position:relative; z-index:2; max-width:1240px; margin:0 auto; width:100%; }
+.hero .kicker{
+  font-family:var(--mono);
+  font-size:12px; letter-spacing:0.32em;
+  color:var(--gold);
+  display:flex; align-items:center; gap:14px;
+  margin-bottom:clamp(22px,3.4vw,36px);
+}
+.hero .kicker::before{ content:""; width:34px; height:1px; background:var(--gold); }
+.hero .headline{
+  font-family:var(--serif); font-weight:400;
+  font-size:clamp(32px,6vw,78px);
+  line-height:1.5;
+  letter-spacing:0.03em;
+  max-width:16em;
+}
+.hero .headline em{ font-style:normal; color:var(--gold); }
+.hero .lede{
+  margin-top:clamp(24px,3.6vw,38px);
+  font-family:var(--serif);
+  font-size:clamp(15px,1.7vw,19px);
+  line-height:2.05;
+  letter-spacing:0.06em;
+  color:var(--ink-light-dim);
+  max-width:38em;
+}
+.hero-scroll{
+  position:relative; z-index:2;
+  margin-top:clamp(46px,7vh,80px);
+  display:flex; align-items:center; gap:12px;
+  font-family:var(--mono); font-size:10.5px; letter-spacing:0.3em;
+  color:var(--ink-light-faint);
+}
+.hero-scroll .line{ width:44px; height:1px; background:var(--ink-light-faint); position:relative; overflow:hidden; }
+.hero-scroll .line::after{
+  content:""; position:absolute; left:-100%; top:0; width:100%; height:100%;
+  background:var(--gold); animation:scrollline 2.6s ease-in-out infinite;
+}
+@keyframes scrollline{ 0%{left:-100%;} 60%{left:100%;} 100%{left:100%;} }
+
+/* ==========================================================================
+   4. 誌面レイアウト共通
+   ========================================================================== */
+main{ position:relative; z-index:1; background:var(--paper-0); }
+.issue{
+  padding: clamp(80px,11vw,140px) clamp(20px,6vw,80px);
+}
+.issue.alt{ background:var(--paper-1); }
+.issue-inner{ max-width:1180px; margin:0 auto; }
+.narrow{ max-width:36em; margin-left:auto; margin-right:auto; }
+.eyebrow{
+  font-family:var(--mono); font-size:11.5px; letter-spacing:0.3em;
+  color:var(--accent);
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:clamp(22px,3vw,34px);
+}
+.eyebrow::before{ content:""; width:30px; height:1px; background:var(--accent); }
+.headline{
+  font-family:var(--serif); font-weight:400;
+  font-size:clamp(28px,4.4vw,52px);
+  line-height:1.55; letter-spacing:0.03em; color:var(--ink);
+}
+.headline em{ font-style:normal; color:var(--accent); }
+.lede{
+  font-family:var(--serif);
+  font-size:clamp(16px,1.8vw,19px);
+  line-height:2.05; letter-spacing:0.04em;
+  color:var(--ink-dim);
+  margin-top:clamp(18px,2.6vw,28px);
+}
+.body-text{
+  font-family:var(--sans);
+  font-size:clamp(14px,1.4vw,15.5px);
+  line-height:2.05; letter-spacing:0.02em;
+  color:var(--ink-dim);
+}
+
+/* ==========================================================================
+   5. 「思想」を語るエッセイ
+   ========================================================================== */
+.essay{ }
+.essay-head{ text-align:center; margin-bottom:clamp(50px,7vw,80px); }
+.essay-head .headline{ max-width:14em; margin:0 auto; }
+.byline{
+  margin-top:clamp(20px,3vw,30px);
+  font-family:var(--mono); font-size:11px; letter-spacing:0.18em;
+  color:var(--ink-faint);
+}
+.essay-body p{
+  font-family:var(--serif);
+  font-size:clamp(15.5px,1.6vw,17.5px);
+  line-height:2.15; letter-spacing:0.03em;
+  color:var(--ink-dim);
+}
+.essay-body p + p{ margin-top:1.7em; }
+.drop-cap-p::first-letter{
+  font-family:var(--serif);
+  font-size:3.6em;
+  line-height:0.78;
+  float:left;
+  padding:0.08em 0.12em 0 0;
+  color:var(--accent);
+}
+.pull-quote{
+  font-family:var(--serif);
+  font-size:clamp(22px,2.8vw,32px);
+  line-height:1.75; letter-spacing:0.03em;
+  color:var(--ink);
+  border-left:2px solid var(--accent);
+  padding: 4px 0 4px clamp(20px,3vw,32px);
+  margin: clamp(40px,5.4vw,66px) 0;
+}
+.pull-quote small{
+  display:block; margin-top:14px;
+  font-family:var(--mono); font-size:11px; letter-spacing:0.16em;
+  color:var(--ink-faint);
+}
+
+/* ==========================================================================
+   6. 事業(記事の見出し的な体裁)
+   ========================================================================== */
+.service-article{
+  display:grid;
+  grid-template-columns: 0.32fr 1fr;
+  gap:clamp(30px,4vw,60px);
+  padding: clamp(40px,5.5vw,64px) 0;
+  border-top:1px solid var(--paper-line);
+  align-items:start;
+}
+.service-article:last-child{ border-bottom:1px solid var(--paper-line); }
+.service-num{
+  font-family:var(--serif);
+  font-size:clamp(40px,5vw,64px);
+  color:var(--ink-faint);
+  line-height:1;
+}
+.service-visual{ display:inline-block; margin-top:18px; width:56px; height:56px; }
+.service-visual svg{ width:100%; height:100%; }
+.service-kicker{
+  font-family:var(--mono); font-size:11px; letter-spacing:0.22em;
+  color:var(--accent); margin-bottom:12px;
+}
+.service-title{
+  font-family:var(--serif);
+  font-size:clamp(22px,2.8vw,32px);
+  line-height:1.55; letter-spacing:0.03em; color:var(--ink);
+  margin-bottom:14px;
+}
+.service-lede{
+  font-family:var(--sans);
+  font-size:clamp(14px,1.4vw,15.5px);
+  line-height:2.05; letter-spacing:0.02em; color:var(--ink-dim);
+  max-width:42em;
+}
+.service-lede + .service-lede{ margin-top:12px; }
+
+/* ==========================================================================
+   7. 実績(引用・出典スタイル)
+   ========================================================================== */
+.works-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(260px,1fr));
+  gap:clamp(28px,3.4vw,44px);
+  margin-top:clamp(46px,6vw,72px);
+}
+.work-cite{ border-top:1px solid var(--paper-line); padding-top:20px; }
+.work-icon{ display:inline-block; width:30px; height:30px; margin-bottom:16px; }
+.work-icon svg{ width:100%; height:100%; }
+.work-tag{ font-family:var(--mono); font-size:10.5px; letter-spacing:0.2em; color:var(--accent); margin-bottom:10px; }
+.work-title{
+  font-family:var(--serif); font-size:clamp(18px,2vw,22px);
+  line-height:1.65; color:var(--ink); margin-bottom:10px;
+}
+.work-body{
+  font-family:var(--sans); font-size:13.5px; line-height:1.95; color:var(--ink-dim);
+}
+
+/* ==========================================================================
+   8. 安心の運用サポート
+   ========================================================================== */
+.support-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(260px,1fr));
+  gap:clamp(26px,3.4vw,44px);
+  margin-top:clamp(46px,6vw,72px);
+}
+.support-card{
+  background:var(--paper-0);
+  border:1px solid var(--paper-line);
+  padding:clamp(24px,3vw,34px);
+}
+.support-card .num{
+  font-family:var(--mono); font-size:11px; letter-spacing:0.2em; color:var(--accent);
+}
+.support-card h3{
+  font-family:var(--serif); font-size:clamp(18px,2vw,22px);
+  margin:14px 0; line-height:1.6; color:var(--ink);
+}
+.support-card p{
+  font-family:var(--sans); font-size:14px; line-height:2; color:var(--ink-dim);
+}
+.support-hand{
+  display:flex; align-items:center; gap:18px;
+  margin-top:clamp(40px,5vw,60px);
+  padding: clamp(22px,3vw,30px) clamp(24px,3vw,32px);
+  border-left:2px solid var(--accent);
+  background:var(--paper-1);
+}
+.support-hand-icon{ display:inline-block; width:44px; height:44px; flex:none; }
+.support-hand-icon svg{ width:100%; height:100%; }
+.support-note{
+  font-family:var(--serif);
+  font-size:clamp(14.5px,1.5vw,16.5px);
+  line-height:2.05; color:var(--ink-dim);
+}
+
+/* ==========================================================================
+   9. CONTACT(誌面を一度だけ暗色で締める=夜空へ再び視界が開く演出)
+   ========================================================================== */
+.contact-issue{
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 100%, #232c52 0%, transparent 62%),
+    linear-gradient(180deg, var(--navy-2) 0%, var(--navy-0) 100%);
+  color:var(--ink-light);
+  text-align:center;
+}
+.contact-issue .eyebrow{ justify-content:center; color:var(--gold); }
+.contact-issue .eyebrow::before{ background:var(--gold); }
+.contact-issue .headline{ color:var(--ink-light); max-width:16em; margin:0 auto; }
+.contact-issue .lede{ color:var(--ink-light-dim); max-width:38em; margin-left:auto; margin-right:auto; }
+.contact-cta{
+  margin-top:clamp(40px,6vw,60px);
+  display:inline-flex; flex-direction:column; align-items:center; gap:18px;
+}
+.contact-cta a.btn{
+  font-family:var(--mono); font-size:13px; letter-spacing:0.3em;
+  padding:20px 58px;
+  border:1px solid var(--gold);
+  color:var(--ink-light);
+  transition:background .35s ease, color .35s ease;
+}
+.contact-cta a.btn:hover{ background:var(--gold); color:var(--navy-0); }
+.contact-meta{
+  margin-top:22px;
+  font-family:var(--mono); font-size:11px; letter-spacing:0.14em;
+  color:var(--ink-light-faint); line-height:2;
+}
+
+/* ==========================================================================
+   10. フッター
+   ========================================================================== */
+footer{
+  padding:clamp(44px,6vw,70px) clamp(20px,6vw,80px) clamp(28px,4vw,44px);
+  display:flex; flex-wrap:wrap; gap:24px;
+  align-items:center; justify-content:space-between;
+  border-top:1px solid var(--paper-line);
+  background:var(--paper-0);
+}
+footer .f-logo{ font-family:var(--serif); font-size:16px; letter-spacing:0.16em; color:var(--ink); }
+footer .f-meta{ font-family:var(--sans); font-size:12px; letter-spacing:0.05em; color:var(--ink-faint); line-height:1.9; }
+footer .f-nav{ display:flex; gap:22px; }
+footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em; color:var(--ink-dim); }
+
+/* ==========================================================================
+   11. オープニング演出(design-C と同一パターン: ボタン→燕1羽→光が広がる)
+   ========================================================================== */
+.opening-overlay{
+  position:fixed; inset:0; z-index:900;
+  background:var(--navy-0);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; opacity:1;
+  transition: opacity .9s ease;
+}
+.opening-overlay.is-done{ opacity:0; pointer-events:none; }
+.opening-overlay[hidden]{ display:none; }
+.opening-stage{ position:relative; z-index:2; text-align:center; transition:opacity .5s ease; }
+.opening-overlay.is-launching .opening-stage{ opacity:0; pointer-events:none; }
+.opening-start{
+  appearance:none; background:none; border:none; cursor:pointer;
+  color:var(--ink-light);
+  display:inline-flex; flex-direction:column; align-items:center; gap:16px;
+  font-family:var(--mono); font-size:11px; letter-spacing:0.3em;
+}
+.opening-start .ost-circle{
+  width:60px; height:60px;
+  border:1px solid var(--ink-light-faint);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  transition:border-color .4s ease, transform .4s ease;
+}
+.opening-start:hover .ost-circle{ border-color:var(--gold); transform:translateY(-3px); }
+.opening-start .ost-circle svg{ width:16px; height:16px; color:var(--gold); }
+.opening-start:active .ost-circle,
+.opening-start.is-pressed .ost-circle{
+  transform:scale(.85); border-color:var(--gold);
+  transition:transform .14s cubic-bezier(.3,.7,.4,1), border-color .14s ease;
+}
+/* 1羽の燕:左下から右上(=大空)へ。進むほど小さく・薄く=遠く高く飛び去る */
+.opening-swallow{
+  position:absolute; left:-6%; bottom:16%;
+  width:clamp(70px,10vw,128px); z-index:1;
+  opacity:0; pointer-events:none;
+  will-change: translate, scale, opacity;
+}
+.opening-swallow svg{ width:100%; height:auto; display:block; }
+.opening-overlay.is-launching .opening-swallow{
+  animation: swallow-move 3.2s linear forwards, swallow-fade 3.2s linear forwards;
+  animation-delay:.35s, .35s;
+}
+@keyframes swallow-move{ 0%{ translate:0 0; rotate:-4deg; } 100%{ translate:112vw -72vh; rotate:8deg; } }
+@keyframes swallow-fade{ 0%{opacity:0; scale:1;} 8%{opacity:.96; scale:.98;} 70%{opacity:.8; scale:.52;} 100%{opacity:0; scale:.26;} }
+.opening-light{
+  position:absolute; inset:0; z-index:3; pointer-events:none;
+  background: radial-gradient(circle at 88% 8%, #fdf6e3 0%, var(--gold) 30%, var(--accent-soft) 62%, transparent 100%);
+  clip-path: circle(0% at 88% 8%);
+}
+.opening-overlay.is-flooding .opening-light{ animation: opening-light-flood 1.6s cubic-bezier(.3,.6,.3,1) forwards; }
+@keyframes opening-light-flood{ from{ clip-path: circle(0% at 88% 8%); } to{ clip-path: circle(150% at 88% 8%); } }
+
+/* ==========================================================================
+   12. レスポンシブ
+   ========================================================================== */
+@media (max-width:820px){
+  nav.masthead-nav{ gap:14px; }
+  .service-article{ grid-template-columns:1fr; }
+  .service-num{ display:none; }
+}
+@media (max-width:480px){
+  header.masthead{ padding:14px 18px; }
+  .issue{ padding-left:20px; padding-right:20px; }
+  .masthead-row{ align-items:flex-start; flex-direction:column; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ オープニング演出(design-C と同一パターン) ============ -->
+<div class="opening-overlay" id="openingOverlay">
+  <div class="opening-stage">
+    <button type="button" class="opening-start" id="openingStart">
+      <span class="ost-label">サイトを開く</span>
+      <span class="ost-circle">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 4 V20 M6 14 L12 20 L18 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </button>
+  </div>
+  <!-- 燕アイコン: "Swallow" by Delapouite (game-icons.net) / CC BY 3.0。座標は無変更 -->
+  <div class="opening-swallow" id="openingSwallow" aria-hidden="true">
+    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+      <path fill="var(--gold)" d="M96.18 22.49C264.6 98.36 403.1 214.8 40.11 270.5 153 268 191.6 291.1 64.12 382.6c230.18-128 331.68-189 318.98 106.9 30.5-54.4 114.6-241 36.4-268.3 6.2-7.4 15.5-19.4 22.1-31.9 13.1-5.7 22.6-13.6 30.3-23.7-8.7-2-16-2.5-22.8-2.3-.2-2.8-.8-5.5-2.1-7.9-8.7-16.5-48.1-13.7-62.4-12.1 4.7-81-226.8-117.09-288.42-120.81z"/>
+    </svg>
+  </div>
+  <div class="opening-light" id="openingLight" aria-hidden="true"></div>
+</div>
+<script>
+  (function(){
+    try{
+      if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+        var el = document.getElementById('openingOverlay');
+        if(el){ el.style.display = 'none'; }
+      }
+    }catch(e){}
+  })();
+</script>
+<noscript><style>.opening-overlay{ display:none !important; }</style></noscript>
+
+<!-- ============ マストヘッド ============ -->
+<header class="masthead" id="top">
+  <div class="masthead-row">
+    <div class="masthead-brand">
+      <span class="masthead-mark icon-glow" aria-hidden="true">
+        <!-- 上昇する軌跡=「視界がひらけていく」を象徴する簡潔なマーク(装飾線画。実在ロゴではない) -->
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 24 C 10 22, 14 16, 17 10 S 24 4, 28 4" stroke="var(--accent)" stroke-width="1.3" stroke-linecap="round"/>
+          <circle cx="28" cy="4" r="1.8" fill="var(--accent)"/>
+        </svg>
+      </span>
+      <div>
+        <span class="masthead-title">Re Journal</span>
+        <span class="masthead-tag">MENTAL HEALTH FOR CHALLENGERS — A JOURNAL OF Re, INC.</span>
+      </div>
+    </div>
+    <nav class="masthead-nav">
+      <a href="#thought">思想</a>
+      <a href="#services">事業</a>
+      <a href="#works">実績</a>
+      <a href="#support">サポート</a>
+      <a href="#contact">CONTACT</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ HERO(粒子演出はこの中だけ) ============ -->
+  <section class="hero" id="hero">
+    <div class="hero-canvas-wrap" aria-hidden="true">
+      <canvas id="heroCanvas"></canvas>
+      <div class="hero-static-dots">
+        <span style="left:12%; top:70%; width:4px; height:4px;"></span>
+        <span style="left:24%; top:40%; width:3px; height:3px;"></span>
+        <span style="left:38%; top:82%; width:5px; height:5px;"></span>
+        <span style="left:52%; top:30%; width:2px; height:2px;"></span>
+        <span style="left:66%; top:60%; width:4px; height:4px;"></span>
+        <span style="left:78%; top:20%; width:3px; height:3px;"></span>
+        <span style="left:88%; top:48%; width:5px; height:5px;"></span>
+        <span style="left:18%; top:14%; width:2px; height:2px;"></span>
+        <span style="left:60%; top:12%; width:3px; height:3px;"></span>
+        <span style="left:92%; top:74%; width:4px; height:4px;"></span>
+      </div>
+    </div>
+    <div class="hero-content">
+      <p class="kicker">ISSUE — 視界がひらける経営へ / VOL.01, 2026</p>
+      <h1 class="headline">高く見渡す経営者に、<br>もうひとつの<em>翼</em>を。</h1>
+      <p class="lede">Re株式会社は、知識と実践を往復させながら、経営とこころの両方に伴走する専門家集団です。曇った視界を整え、経営者が自らの高さで景色を見渡せる状態へ——それが、私たちの仕事です。</p>
+    </div>
+    <div class="hero-scroll">
+      <span>SCROLL</span>
+      <span class="line"></span>
+    </div>
+  </section>
+
+  <!-- ============ 思想を語るエッセイ ============ -->
+  <section class="issue essay" id="thought">
+    <div class="issue-inner narrow">
+      <div class="essay-head">
+        <p class="eyebrow" style="justify-content:center;">THOUGHT — Reの思想</p>
+        <h2 class="headline">なぜ、メンタルヘルスは<br>経営科目になったのか。</h2>
+        <p class="byline">代表取締役 小林 宣文</p>
+      </div>
+
+      <div class="essay-body">
+        <p class="drop-cap-p">経営の意思決定は、視界の広さに比例する。市場の動き、組織の状態、資金の残り時間——それらを一望できるかどうかが、次の一手の質を決める。だが視界を広げようとするほど、経営者自身のこころは狭く、暗くなっていく。孤独な意思決定の積み重ねが、少しずつ視野を曇らせていくからだ。</p>
+        <p>私たちは長らく、メンタルヘルスを「福利厚生」の領域に置いてきた。調子が悪くなったら休む、限界が来たら相談する。順番としては、経営の後回しに位置づけられてきた。しかし実際の現場で見えてくるのは逆の順序だ。経営者のこころの状態が、意思決定の速度と精度、ひいては組織全体の視界の広さを決めている。</p>
+        <p>スタートアップの創業期、資金調達の交渉、事業ピボットの判断——いずれも「正解のない問い」に対して、限られた情報のまま高い場所から景色を見渡し、進む方向を選び続ける仕事だ。視界が曇ったままでは、次の一手は打てない。だからこそ、メンタルヘルスは経営の「余力」ではなく、経営そのものの「視力」として扱う必要がある。</p>
+      </div>
+
+      <blockquote class="pull-quote">
+        経営者の視界の広さは、<br>そのままこころの視界の広さである。
+        <small>— 小林 宣文, 代表取締役</small>
+      </blockquote>
+
+      <div class="essay-body">
+        <p>Reが提供するのは、知識だけでも、対話だけでもない。心理学・組織行動学の知見(知識)と、実際の現場での1on1・研修(実践)を往復させることで、経営者自身が「自分の視界の曇り」に気づき、整えていく力を育てる。羽ばたく先を決めるのは経営者自身であり、私たちはその翼をととのえる役目を担っている。</p>
+        <p>何度でも羽ばたける社会を実現する——それは、一度の失敗や不調で挑戦をやめない社会という意味であり、同時に、視界が曇るたびに、高く見晴らせる場所へ戻ってこられる社会という意味でもある。Reは、その往復に伴走する。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 事業(記事見出し体裁) ============ -->
+  <section class="issue alt" id="services">
+    <div class="issue-inner">
+      <p class="eyebrow">CHAPTER I — 事業内容</p>
+      <h2 class="headline" style="max-width:16em;">三つの角度から、<br>視界を整える。</h2>
+
+      <article class="service-article">
+        <div>
+          <p class="service-num">01</p>
+          <span class="service-visual icon-glow">
+            <svg viewBox="0 0 60 60" fill="none">
+              <path d="M10 46 C 18 34, 26 22, 32 10" stroke="var(--ink-faint)" stroke-width="1.1" stroke-linecap="round"/>
+              <path d="M18 50 C 26 36, 34 24, 40 12" stroke="var(--accent)" stroke-width="1.3" stroke-linecap="round"/>
+              <circle cx="32" cy="10" r="2.2" fill="var(--accent)"/>
+            </svg>
+          </span>
+        </div>
+        <div>
+          <p class="service-kicker">KNOWLEDGE × PRACTICE</p>
+          <h3 class="service-title">知識を、実践に変える。</h3>
+          <p class="service-lede">座学だけで終わらせない、ワークショップ形式のメンタルヘルス研修です。心理学・組織行動学の知見を土台に、実際の職場で起きている出来事をその場で扱いながら、明日から使える対応力を育てます。</p>
+          <p class="service-lede">対象は経営層からマネジメント層まで。「知っている」を「できる」に変える実践設計が特徴です。</p>
+        </div>
+      </article>
+
+      <article class="service-article">
+        <div>
+          <p class="service-num">02</p>
+          <span class="service-visual icon-glow">
+            <svg viewBox="0 0 60 60" fill="none">
+              <circle cx="22" cy="26" r="9" stroke="var(--ink-faint)" stroke-width="1.1"/>
+              <circle cx="38" cy="38" r="9" stroke="var(--accent)" stroke-width="1.3"/>
+              <path d="M29 30 L 31 34" stroke="var(--ink-faint)" stroke-width="1"/>
+            </svg>
+          </span>
+        </div>
+        <div>
+          <p class="service-kicker">FOR CXO</p>
+          <h3 class="service-title">孤独の重さに、輪郭を。</h3>
+          <p class="service-lede">経営の意思決定は、多くの場合ひとりで背負うものです。Reの1on1支援は、CXOという立場特有の孤独やプレッシャーに寄り添い、対話を通じて思考と感情の整理を行う場を提供します。</p>
+          <p class="service-lede">守秘義務のもとで行う継続的なセッションが、次の意思決定の質を静かに支えます。</p>
+        </div>
+      </article>
+
+      <article class="service-article">
+        <div>
+          <p class="service-num">03</p>
+          <span class="service-visual icon-glow">
+            <svg viewBox="0 0 60 60" fill="none">
+              <path d="M10 46 L 24 32 L 34 40 L 50 16" stroke="var(--accent)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="50" cy="16" r="2.2" fill="var(--ink-faint)"/>
+            </svg>
+          </span>
+        </div>
+        <div>
+          <p class="service-kicker">STARTUP / VC / CVC</p>
+          <h3 class="service-title">次の曲線を、共につくる。</h3>
+          <p class="service-lede">スタートアップの創業支援、マーケティング、ファイナンスといった事業面の伴走を行います。VC・CVCの出資先企業に対しても、事業成長とチームの健全性を両輪で支える支援を提供しています。</p>
+          <p class="service-lede">加えて、月額500円のオンライン座談会「めんたるへるす塾」では、日常的に学び合える場を継続的に開いています。</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ 実績・信頼 ============ -->
+  <section class="issue" id="works">
+    <div class="issue-inner">
+      <p class="eyebrow">CHAPTER II — 実績と信頼</p>
+      <h2 class="headline" style="max-width:16em;">歩みは、静かに積み重なっている。</h2>
+      <p class="lede narrow" style="margin-left:0;">ひとつひとつの現場での対話が、やがて社会の側に置く言葉になっていく。</p>
+
+      <div class="works-grid">
+        <div class="work-cite">
+          <span class="work-icon icon-glow">
+            <svg viewBox="0 0 32 32" fill="none"><rect x="5" y="12" width="22" height="14" rx="1.5" stroke="var(--accent)" stroke-width="1.2"/><path d="M10 12 L16 6 L22 12" stroke="var(--accent)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <p class="work-tag">MEDIA</p>
+          <h3 class="work-title">NHK「おはよう日本」にて取材掲載</h3>
+          <p class="work-body">挑戦する人のメンタルヘルスというテーマが全国放送で取り上げられ、経営とこころの両立という視点が社会に共有されました。</p>
+        </div>
+        <div class="work-cite">
+          <span class="work-icon icon-glow">
+            <svg viewBox="0 0 32 32" fill="none"><path d="M4 13 L16 7 L28 13 L16 19 Z" stroke="var(--accent)" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 16 V23 C9 25 22 25 22 23 V16" stroke="var(--accent)" stroke-width="1.1"/></svg>
+          </span>
+          <p class="work-tag">EDUCATION</p>
+          <h3 class="work-title">清泉大学短期大学部でワークショップを開催</h3>
+          <p class="work-body">教育機関との連携により、若い世代に向けたメンタルヘルスの実践的な学びの場を提供しています。</p>
+        </div>
+        <div class="work-cite">
+          <span class="work-icon icon-glow">
+            <svg viewBox="0 0 32 32" fill="none"><circle cx="11" cy="13" r="4.2" stroke="var(--accent)" stroke-width="1.2"/><circle cx="22" cy="15" r="3.4" stroke="var(--accent)" stroke-width="1.2"/><path d="M4 26 C4 20 8 18 12 18 C16 18 19 20 19 24" stroke="var(--accent)" stroke-width="1.1"/><path d="M17 24 C17 21 19.5 19.5 22 19.5 C25 19.5 28 21 28 25" stroke="var(--accent)" stroke-width="1.1"/></svg>
+          </span>
+          <p class="work-tag">COMMUNITY</p>
+          <h3 class="work-title">オンライン座談会「めんたるへるす塾」</h3>
+          <p class="work-body">月額500円で参加できる継続的な学びの場。経営者・実務者が垣根を越えて対話を重ねています。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 安心の運用サポート ============ -->
+  <section class="issue alt" id="support">
+    <div class="issue-inner">
+      <p class="eyebrow">CHAPTER III — 安心の運用サポート</p>
+      <h2 class="headline" style="max-width:16em;">手を、離さない。</h2>
+      <p class="lede narrow" style="margin-left:0;">サイトも、こころと同じように整えながら育てていくものだと考えています。</p>
+
+      <div class="support-grid">
+        <div class="support-card">
+          <p class="num">01</p>
+          <h3>むずかしい操作はありません</h3>
+          <p>お知らせの更新は、専門知識がなくても迷わない管理画面をご用意します。手順書も平易な言葉で作成し、操作に困ったときはこちらでいつでもサポートします。</p>
+        </div>
+        <div class="support-card">
+          <p class="num">02</p>
+          <h3>写真は、鍵のかかる場所に</h3>
+          <p>ニュースリリースに使う写真は、専用の保管場所でまとめて管理します。誰が・いつ・何をアップロードしたかが分かる仕組みにし、迷子にならないようにします。</p>
+        </div>
+        <div class="support-card">
+          <p class="num">03</p>
+          <h3>パスワードのルールを、先にお渡しします</h3>
+          <p>管理画面やパスワードの取り扱いについて、専門用語を使わないガイドラインを事前にご用意します。定期的な見直しの時期もこちらからお知らせします。</p>
+        </div>
+      </div>
+
+      <div class="support-hand">
+        <span class="support-hand-icon icon-glow">
+          <!-- 握手アイコン(Material Design Icons由来。Apache-2.0ライセンスで商用利用可。座標は無変更) -->
+          <svg viewBox="0 0 24 24" fill="var(--accent)"><path d="M11 6H14L17.29 2.7A1 1 0 0 1 18.71 2.7L21.29 5.29A1 1 0 0 1 21.29 6.7L19 9H11V11A1 1 0 0 1 10 12A1 1 0 0 1 9 11V8A2 2 0 0 1 11 6M5 11V15L2.71 17.29A1 1 0 0 0 2.71 18.7L5.29 21.29A1 1 0 0 0 6.71 21.29L11 17H15A1 1 0 0 0 16 16V15H17A1 1 0 0 0 18 14V13H19A1 1 0 0 0 20 12V11H13V12A2 2 0 0 1 11 14H9A2 2 0 0 1 7 12V9Z"/></svg>
+        </span>
+        <p class="support-note">「更新のたびに不安になる」を、なくしたい。運用が始まったあとこそ、私たちの本番だと考えています。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section class="issue contact-issue" id="contact">
+    <div class="issue-inner">
+      <p class="eyebrow">EPILOGUE</p>
+      <h2 class="headline">まずは、話すところから。</h2>
+      <p class="lede">研修のご相談も、1on1のご相談も、事業支援のご相談も。小さな違和感の段階から、お気軽にお声がけください。共に、高いところから景色を見渡しましょう。</p>
+      <div class="contact-cta">
+        <a class="btn" href="mailto:info@re-example.co.jp">お問い合わせはこちら</a>
+        <p class="contact-meta">RECEPTION HOURS — MON–FRI 10:00–18:00<br>通常1〜2営業日以内にご返信いたします</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div>
+    <p class="f-logo">Re, Inc.</p>
+    <p class="f-meta">代表取締役 小林 宣文<br>Mental health for Challengers</p>
+  </div>
+  <nav class="f-nav">
+    <a href="#top">TOP</a>
+    <a href="#services">事業</a>
+    <a href="#contact">CONTACT</a>
+  </nav>
+  <p class="f-meta">&copy; 2026 Re, Inc. All Rights Reserved.</p>
+</footer>
+
+<script>
+/* ---- オープニング演出:ボタン→燕1羽→右上(大空)から光→本編へ ---- */
+(function(){
+  "use strict";
+  var overlay = document.getElementById('openingOverlay');
+  if(!overlay) return;
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(reduced){ overlay.style.display = 'none'; return; }
+
+  var startBtn = document.getElementById('openingStart');
+  var htmlEl = document.documentElement;
+  var launched = false;
+  function launch(){
+    if(launched) return;
+    launched = true;
+    startBtn.classList.add('is-pressed');
+    htmlEl.style.overflow = 'hidden';
+    overlay.classList.add('is-launching');
+    window.setTimeout(function(){ overlay.classList.add('is-flooding'); }, 2700);
+    window.setTimeout(function(){
+      overlay.classList.add('is-done');
+      htmlEl.style.overflow = '';
+      window.setTimeout(function(){ overlay.setAttribute('hidden', ''); }, 950);
+    }, 4400);
+  }
+  if(startBtn){ startBtn.addEventListener('click', launch, { once:true }); }
+})();
+</script>
+
+<script>
+/* ---- ヒーロー限定・光の粒子(Canvas 2D、外部ライブラリなし) ----
+   流れ場(擬似ノイズ)+わずかな上昇バイアスで、「大空へ向かって立ちのぼる光」の
+   ような動きにする(=羽ばたいて視界がひらけていくイメージ)。マウスにはごく
+   軽く反応。ヒーローが画面外になったら停止し、本編(誌面)側は一切粒子を出さない。 */
+(function(){
+  "use strict";
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var hero = document.getElementById('hero');
+  var canvas = document.getElementById('heroCanvas');
+  if(reduced || !hero || !canvas || !canvas.getContext) return;
+  var ctx = canvas.getContext('2d');
+  if(!ctx) return;
+  document.body.classList.add('js-hero-canvas');
+
+  var W = 0, H = 0, dpr = 1;
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var rect = hero.getBoundingClientRect();
+    W = rect.width; H = rect.height;
+    canvas.width  = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize, { passive:true });
+
+  var isTouch = window.matchMedia("(pointer: coarse)").matches;
+  var mx = -1e5, my = -1e5;
+  if(!isTouch){
+    hero.addEventListener('mousemove', function(e){
+      var r = hero.getBoundingClientRect();
+      mx = e.clientX - r.left; my = e.clientY - r.top;
+    }, { passive:true });
+    hero.addEventListener('mouseleave', function(){ mx = -1e5; my = -1e5; });
+  }
+
+  var COUNT = (W < 700) ? 55 : 100;
+  var particles = [];
+  function spawn(p){
+    p.x = Math.random() * W;
+    p.y = H + Math.random() * 60;
+    p.z = Math.pow(Math.random(), 1.5);
+    p.phase = Math.random() * Math.PI * 2;
+    p.twSpeed = 0.6 + Math.random() * 1.4;
+    p.vx = 0; p.vy = 0;
+    return p;
+  }
+  for(var i = 0; i < COUNT; i++){
+    var p = spawn({});
+    p.y = Math.random() * H; // 初期表示はランダムな高さから
+    particles.push(p);
+  }
+
+  function flowAngle(x, y, t){
+    return (
+      Math.sin(x * 0.0018 + t * 0.00019) * 1.2 +
+      Math.cos(y * 0.0016 - t * 0.00014) * 1.1 +
+      Math.sin((x + y) * 0.0008 + t * 0.00008) * 0.7
+    );
+  }
+
+  var GOLD = '216,196,143';
+  var WHITE = '250,246,235';
+  var running = true;
+  var io = null;
+  if('IntersectionObserver' in window){
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        running = entry.isIntersecting;
+        if(running) window.requestAnimationFrame(tick);
+      });
+    }, { threshold: 0.05 });
+    io.observe(hero);
+  }
+  document.addEventListener('visibilitychange', function(){
+    running = !document.hidden && running !== false;
+    if(!document.hidden) window.requestAnimationFrame(tick);
+  });
+
+  var MARGIN = 30;
+  function tick(t){
+    if(document.hidden) return;
+    if(io && !isInView()) return;
+    ctx.clearRect(0, 0, W, H);
+
+    for(var i = 0; i < particles.length; i++){
+      var p = particles[i];
+      var speed = 0.12 + p.z * 0.30;
+      var a = flowAngle(p.x, p.y, t);
+      var tx = Math.cos(a) * speed * 0.6;
+      var ty = Math.sin(a) * speed * 0.5 - (0.10 + p.z * 0.16); // 常に上昇=大空へ向かう
+
+      var dx = p.x - mx, dy = p.y - my;
+      var d2 = dx * dx + dy * dy;
+      var R = 130;
+      if(d2 < R * R){
+        var d = Math.sqrt(d2) || 1;
+        var f = (1 - d / R) * (0.4 + p.z * 0.7) * 0.7;
+        tx += (dx / d) * f;
+        ty += (dy / d) * f;
+      }
+
+      p.vx += (tx - p.vx) * 0.05;
+      p.vy += (ty - p.vy) * 0.05;
+      p.x += p.vx;
+      p.y += p.vy;
+
+      if(p.x < -MARGIN) p.x = W + MARGIN;
+      if(p.x >  W + MARGIN) p.x = -MARGIN;
+      if(p.y < -MARGIN){ spawn(p); } // 上端(大空)まで昇りきったら下から再び立ちのぼる
+
+      var tw = 0.6 + 0.4 * Math.sin(t * 0.001 * p.twSpeed + p.phase);
+      var alpha = (0.08 + p.z * 0.36) * tw;
+      var r = 0.5 + p.z * 1.8;
+
+      if(p.z > 0.55){
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(' + GOLD + ',' + (alpha * 0.2).toFixed(3) + ')';
+        ctx.arc(p.x, p.y, r * 3, 0, 6.2832);
+        ctx.fill();
+      }
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(' + (p.z > 0.8 ? WHITE : GOLD) + ',' + alpha.toFixed(3) + ')';
+      ctx.arc(p.x, p.y, r, 0, 6.2832);
+      ctx.fill();
+    }
+    window.requestAnimationFrame(tick);
+  }
+
+  function isInView(){
+    var r = hero.getBoundingClientRect();
+    return r.bottom > 0 && r.top < window.innerHeight;
+  }
+
+  window.requestAnimationFrame(tick);
+})();
+</script>
+
+</body>
+</html>
