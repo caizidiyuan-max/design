@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Re株式会社 | Mental health for Challengers(デザイン案F:静かな深海)</title>
-<meta name="description" content="挑戦する人のメンタルヘルス。知識×実践型研修、CXO向け1on1支援、事業支援を行うRe株式会社のコーポレートサイト(デザイン案F:静かな深海)">
+<title>株式会社Re｜挑戦する人のためのメンタルヘルス</title>
+<meta name="description" content="挑戦する人のためのメンタルヘルス。株式会社Re(アールイー)は、経営層と成長企業の現場に特化した実践型メンタルヘルス支援企業です。オーダーメイド支援・知識×実践型メンタルヘルス研修・1on1メンタルヘルス相談を行っています。">
 <style>
 /* ==========================================================================
    0. リセット / 基本設定
@@ -55,7 +55,7 @@ button{ font-family:inherit; }
 /* ==========================================================================
    1. 背景レイヤー(固定・深海のグラデーション+光の粒子)
    「深海の底から、水面の光=大きな空へ向かって浮上していく」感覚を
-   スクロール全体を通じて薄くにじませる。 progress は support セクションの
+   スクロール全体を通じて薄くにじませる。 progress は member セクションの
    出現位置で 0→1 に進み、上部にごく淡い水面の光を足す。
    ========================================================================== */
 .bg-fixed{
@@ -130,7 +130,21 @@ header.site-header{
   z-index:40;
   display:flex; align-items:center; justify-content:space-between;
   padding: clamp(16px,3vw,28px) clamp(18px,4vw,48px);
-  mix-blend-mode:difference;
+  /* 固定ヘッダーの背景(深海のトーンのまま、本文の文字と重なっても読めるようにする)
+     ロゴが複数行に折り返しても透けないよう、ヘッダー本体は全高しっかり覆い、
+     ふわっと消えるグラデーションは ::after でヘッダーの下に延長する */
+  background: linear-gradient(180deg,
+      rgba(3,5,9,0.98) 0%,
+      rgba(3,5,9,0.96) 100%);
+}
+header.site-header::after{
+  content:"";
+  position:absolute; left:0; right:0; top:100%; height:28px;
+  background: linear-gradient(180deg,
+      rgba(3,5,9,0.96) 0%,
+      rgba(3,5,9,0.55) 45%,
+      rgba(3,5,9,0) 100%);
+  pointer-events:none;
 }
 .logo{
   font-family:var(--mono);
@@ -251,8 +265,8 @@ body.js-fall .fall-in.is-visible{ opacity:1; transform:translateY(0); }
   .service-title, .service-desc,
   .credential h3, .credential p, .credential .tag,
   .specialty-card .s-poetic, .specialty-card .s-tag, .specialty-card p, .specialty-card .s-num,
-  .support-card h3, .support-card p, .support-card .num,
-  .support-note, .contact-meta{
+  .member-card h3, .member-card p, .member-card .num,
+  .member-note, .contact-meta{
     transition: text-shadow .55s ease, color .55s ease;
   }
   .headline:hover, .poetic:hover, .body-text:hover, .intro h1:hover, .intro .kanban:hover,
@@ -261,23 +275,23 @@ body.js-fall .fall-in.is-visible{ opacity:1; transform:translateY(0); }
   .credential:hover h3, .credential:hover p, .credential:hover .tag,
   .specialty-card:hover .s-poetic, .specialty-card:hover .s-tag,
   .specialty-card:hover p, .specialty-card:hover .s-num,
-  .support-card:hover h3, .support-card:hover p, .support-card:hover .num,
-  .support-note:hover, .contact-meta:hover{
+  .member-card:hover h3, .member-card:hover p, .member-card:hover .num,
+  .member-note:hover, .contact-meta:hover{
     text-shadow:
       0 0 22px rgba(var(--glow-rgb), .42),
       0 0 6px  rgba(var(--glow-rgb), .24);
   }
   .poetic:hover, .body-text:hover, .hero .sub:hover, .service-desc:hover,
-  .credential:hover p, .specialty-card:hover p, .support-card:hover p,
-  .support-note:hover{ color: var(--ink); }
+  .credential:hover p, .specialty-card:hover p, .member-card:hover p,
+  .member-note:hover{ color: var(--ink); }
 
   /* ---- 図形・アイコンのホバー光(文章と同じトーン) ----
      触れると輪郭がふわっと光る。line-icon の path / circle 自体に
      drop-shadow を掛け、囲みの円・カードにも淡いグローを添える。 */
-  .service-visual, .specialty-icon, .support-icon, .handshake-art{
+  .service-visual, .specialty-icon, .member-icon, .handshake-art{
     transition: filter .55s ease, border-color .55s ease, box-shadow .55s ease;
   }
-  .service-visual svg, .specialty-icon svg, .support-icon svg{
+  .service-visual svg, .specialty-icon svg, .member-icon svg{
     transition: filter .55s ease;
   }
   .service-block:hover .service-visual{
@@ -286,11 +300,11 @@ body.js-fall .fall-in.is-visible{ opacity:1; transform:translateY(0); }
   }
   .service-block:hover .service-visual svg,
   .specialty-card:hover .specialty-icon svg,
-  .support-card:hover .support-icon svg{
+  .member-card:hover .member-icon svg{
     filter: drop-shadow(0 0 10px rgba(var(--glow-rgb), .75)) drop-shadow(0 0 2px rgba(var(--glow-rgb), .9));
   }
   .specialty-card:hover .specialty-icon,
-  .support-card:hover .support-icon{
+  .member-card:hover .member-icon{
     box-shadow: 0 0 28px rgba(var(--glow-rgb), .18);
     border-color: var(--accent);
   }
@@ -299,8 +313,8 @@ body.js-fall .fall-in.is-visible{ opacity:1; transform:translateY(0); }
   }
 }
 @media (prefers-reduced-motion: reduce){
-  .headline, .poetic, .body-text, .service-desc, .support-note,
-  .service-visual, .specialty-icon, .support-icon{ transition:none; }
+  .headline, .poetic, .body-text, .service-desc, .member-note,
+  .service-visual, .specialty-icon, .member-icon{ transition:none; }
 }
 
 /* ==========================================================================
@@ -514,33 +528,33 @@ body.js-fall .fall-in.is-visible{ opacity:1; transform:translateY(0); }
 .credential p{ font-family:var(--sans); font-size:14px; line-height:1.9; color:var(--ink-dim); }
 
 /* ==========================================================================
-   8. 安心の運用サポート
+   8. メンバー
    ========================================================================== */
-.support-grid{
+.member-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit, minmax(280px,1fr));
   gap:clamp(30px,4vw,50px);
   margin-top:clamp(50px,7vw,80px);
 }
-.support-card{
+.member-card{
   background: rgba(255,255,255,0.025);
   border:1px solid var(--ink-faint);
   padding:clamp(26px,3vw,38px);
   border-radius:2px;
   display:flex; flex-direction:column; gap:14px;
 }
-.support-icon{
+.member-icon{
   width:44px; height:44px;
   border:1px solid var(--ink-faint);
   border-radius:50%;
   display:flex; align-items:center; justify-content:center;
   transition:border-color .4s ease;
 }
-.support-icon svg{ width:20px; height:20px; }
-.support-card .num{ font-family:var(--mono); font-size:12px; color:var(--accent); letter-spacing:0.2em; }
-.support-card h3{ font-family:var(--serif); font-size:clamp(19px,2.2vw,24px); margin:0; color:var(--ink); line-height:1.6; }
-.support-card p{ font-family:var(--sans); font-size:14px; line-height:2; color:var(--ink-dim); }
-.support-note{
+.member-icon svg{ width:20px; height:20px; }
+.member-card .num{ font-family:var(--mono); font-size:12px; color:var(--accent); letter-spacing:0.2em; }
+.member-card h3{ font-family:var(--serif); font-size:clamp(19px,2.2vw,24px); margin:0; color:var(--ink); line-height:1.6; }
+.member-card p{ font-family:var(--sans); font-size:14px; line-height:2; color:var(--ink-dim); }
+.member-note{
   margin-top:clamp(40px,5vw,60px);
   padding:clamp(20px,3vw,28px) clamp(22px,3vw,30px);
   border-left:2px solid var(--accent);
@@ -601,6 +615,16 @@ footer .f-logo{ font-family:var(--mono); font-size:14px; letter-spacing:0.2em; c
 footer .f-meta{ font-family:var(--sans); font-size:12px; letter-spacing:0.05em; color:var(--ink-faint); line-height:1.9; }
 footer .f-nav{ display:flex; gap:24px; }
 footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em; color:var(--ink-dim); }
+/* 医療機関ではない旨の注記(フッター最終行・全幅) */
+footer .f-note{
+  flex-basis:100%;
+  font-family:var(--sans);
+  font-size:12px;
+  line-height:1.9;
+  letter-spacing:0.04em;
+  color:var(--ink-faint);
+  margin-top:4px;
+}
 
 /* ==========================================================================
    11. オープニング演出(押す→燕1羽が空へ→光が満ちる→本編)
@@ -703,6 +727,8 @@ footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em;
   header.site-header{ padding:14px 18px; }
   nav.main-nav a{ font-size:10px; }
   .section{ padding-left:20px; padding-right:20px; }
+  /* CTAの文言が長いため、狭い画面では字間と余白を詰めて横あふれを防ぐ */
+  .contact-cta a.btn{ font-size:12px; letter-spacing:0.18em; padding:18px 24px; }
 }
 </style>
 </head>
@@ -770,13 +796,13 @@ footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em;
   <nav class="main-nav">
     <a href="#top">TOP</a>
     <a href="#services">SERVICE</a>
-    <a href="#support">SUPPORT</a>
+    <a href="#members">MEMBER</a>
     <a href="#contact">CONTACT</a>
   </nav>
 </header>
 
 <div class="progress-ui" aria-hidden="true">
-  <div class="count"><span class="cur">00</span> / 06</div>
+  <div class="count"><span class="cur">00</span> / 04</div>
   <div class="label" data-label>PROLOGUE</div>
   <div class="track"><em style="--dot-y:0px"></em></div>
 </div>
@@ -785,7 +811,7 @@ footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em;
 
   <!-- ============ INTRO ============ -->
   <section class="intro">
-    <p class="kanban">Re Corporate Site — Renewal Concept F: Quiet Deep Sea</p>
+    <p class="kanban">Re — Mental health for Challengers</p>
     <h1>
       深く静かに、また空へ。
       <small>Mental health for Challengers</small>
@@ -803,7 +829,7 @@ footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em;
     <div class="section-inner">
       <p class="chapter-no fall-in" style="--fall-delay:0;">PROLOGUE — 深く、静かに考える時間</p>
       <h1 class="headline fall-in" style="--fall-delay:90;">沈んだこころにも、<br>光は届く。<br><em>何度でも、羽ばたける社会</em>へ。</h1>
-      <p class="sub fall-in" style="--fall-delay:220;">Re株式会社は、知識と実践を往復させながら&#8203;<br>経営とこころの両方に伴走する専門家集団です。</p>
+      <p class="sub fall-in" style="--fall-delay:220;">株式会社Re(アールイー)は、経営層と成長企業の現場に特化した&#8203;<br>実践型メンタルヘルス支援企業です。<br>予防・早期介入から復帰まで、一貫して伴走します。</p>
       <p class="ascend fall-in" style="--fall-delay:320;">
         <span class="arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M12 20 V4 M6 10 L12 4 L18 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         深海の底から、水面の光へ
@@ -820,9 +846,26 @@ footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em;
     <div class="section-inner">
       <p class="eyebrow fall-in">CHAPTER I — 事業内容</p>
 
-      <div class="service-block" data-index="1" data-label="研修">
+      <div class="service-block" data-index="1" data-label="オーダーメイド支援">
         <div class="service-visual">
           <span class="service-index">01</span>
+          <svg viewBox="0 0 120 120" fill="none">
+            <circle cx="45" cy="50" r="16" stroke="var(--ink-dim)" stroke-width="1.2"/>
+            <circle cx="75" cy="70" r="16" stroke="var(--accent)" stroke-width="1.2"/>
+            <path d="M58 55 L 62 65" stroke="var(--ink-faint)" stroke-width="1"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="service-title fall-in"><small>TAILORED SUPPORT — CXO / MANAGER</small>言えないことを、<br>置いておける場所を。</h3>
+          <p class="service-desc fall-in" style="--fall-delay:80;">最高経営責任者をはじめとする経営層・管理職の方に向けた、オーダーメイドの伴走支援です。日々のメンタル面のサポートと相談を軸に、必要に応じてトラブルのご相談もお受けします。法律や医療の判断が必要な場面では、内容により弁護士・医師が対応チームに加わります。</p>
+          <p class="service-desc fall-in" style="--fall-delay:160;">これまでにいただいたご相談は、組織改革のさなかに生まれた軋轢、株主や取引先とのトラブル、市場の大きな変動、社内で起きたトラブルなどです。</p>
+          <p class="service-desc fall-in" style="--fall-delay:240;">秘匿性の高い領域のため、すべて非公開での個別対応です。サービスの設計とお見積りは、状況をうかがったうえで個別にご提案します。</p>
+        </div>
+      </div>
+
+      <div class="service-block" data-index="2" data-label="研修">
+        <div class="service-visual">
+          <span class="service-index">02</span>
           <svg viewBox="0 0 120 120" fill="none">
             <path d="M20 90 C 30 60, 50 40, 60 20" stroke="var(--ink-dim)" stroke-width="1.2" stroke-linecap="round"/>
             <path d="M35 95 C 45 65, 62 42, 78 25" stroke="var(--accent)" stroke-width="1.2" stroke-linecap="round"/>
@@ -832,28 +875,16 @@ footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em;
         </div>
         <div>
           <h3 class="service-title fall-in"><small>KNOWLEDGE × PRACTICE</small>知識を、実践に変える。</h3>
-          <p class="service-desc fall-in" style="--fall-delay:80;">座学だけで終わらせない、ワークショップ形式のメンタルヘルス研修です。心理学・組織行動学の知見を土台に、実際の職場で起きている出来事をその場で扱いながら、明日から使える対応力を育てます。</p>
-          <p class="service-desc fall-in" style="--fall-delay:160;">対象は経営層からマネジメント層まで。「知っている」を「できる」に変える実践設計が特徴です。</p>
+          <p class="service-desc fall-in" style="--fall-delay:80;">体系化された知識の共有と議論を土台に、具体的なトラブル事例をその場で扱う、ワークショップ形式のメンタルヘルス研修です。医療機関で行われているプログラムを土台にしており、講師は医療の専門家と当事者が務めます。使用したスライドはすべてお渡しし、社内の勉強会にもご活用いただけます。</p>
+          <p class="service-desc fall-in" style="--fall-delay:160;">費用は250,000〜500,000円/回です。月1回・全6回(1回3時間)を基本に、スポットでの実施にも対応します。発言の機会を全員に確保するため、発言参加は対面30名・オンライン20名までとしています。視聴のみのご参加は人数制限なしです。</p>
+          <p class="service-desc fall-in" style="--fall-delay:240;">研修メニューは、目的に合わせて3種類をご用意しています。</p>
+          <p class="service-desc fall-in" style="--fall-delay:300;">初回・単発向けは「日常で役立つメンタルスキル入門」と「当事者の回復過程から学ぶ予防と対策」の2本です(250,000円/回)。</p>
+          <p class="service-desc fall-in" style="--fall-delay:360;">複数回向けは「業務で使えるメンタルスキルワークショップ」。SST、アサーション、ストレスコーピング、バウンダリーなどを扱います(350,000〜500,000円/回)。</p>
+          <p class="service-desc fall-in" style="--fall-delay:420;">ボードゲーム「キャリアでQUEST」を使う「自身のスキル発掘・キャリア再発見ワークショップ」もご用意しています(350,000円/回)。</p>
         </div>
       </div>
 
-      <div class="service-block" data-index="2" data-label="1on1">
-        <div class="service-visual">
-          <span class="service-index">02</span>
-          <svg viewBox="0 0 120 120" fill="none">
-            <circle cx="45" cy="50" r="16" stroke="var(--ink-dim)" stroke-width="1.2"/>
-            <circle cx="75" cy="70" r="16" stroke="var(--accent)" stroke-width="1.2"/>
-            <path d="M58 55 L 62 65" stroke="var(--ink-faint)" stroke-width="1"/>
-          </svg>
-        </div>
-        <div>
-          <h3 class="service-title fall-in"><small>FOR CXO</small>孤独の重さに、輪郭を。</h3>
-          <p class="service-desc fall-in" style="--fall-delay:80;">経営の意思決定は、多くの場合ひとりで背負うものです。Reの1on1支援は、CXOという立場特有の孤独やプレッシャーに寄り添い、対話を通じて思考と感情の整理を行う場を提供します。</p>
-          <p class="service-desc fall-in" style="--fall-delay:160;">守秘義務のもとで行う継続的なセッションが、次の意思決定の質を静かに支えます。</p>
-        </div>
-      </div>
-
-      <div class="service-block" data-index="3" data-label="事業支援">
+      <div class="service-block" data-index="3" data-label="1on1相談">
         <div class="service-visual">
           <span class="service-index">03</span>
           <svg viewBox="0 0 120 120" fill="none">
@@ -862,9 +893,10 @@ footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em;
           </svg>
         </div>
         <div>
-          <h3 class="service-title fall-in"><small>STARTUP / VC / CVC</small>次の曲線を、共につくる。</h3>
-          <p class="service-desc fall-in" style="--fall-delay:80;">スタートアップの創業支援、マーケティング、ファイナンスといった事業面の伴走を行います。VC・CVCの出資先企業に対しても、事業成長とチームの健全性を両輪で支える支援を提供しています。</p>
-          <p class="service-desc fall-in" style="--fall-delay:160;">加えて、月額500円のオンライン座談会「めんたるへるす塾」では、日常的に学び合える場を継続的に開いています。</p>
+          <h3 class="service-title fall-in"><small>ONE ON ONE</small>話す相手を、<br>選べるということ。</h3>
+          <p class="service-desc fall-in" style="--fall-delay:80;">暮らしのご相談から、こころと身体の不調まで、幅広く1対1でお受けします。ご希望に合わせて、専門家、または近い経験を持つピアサポーター(当事者)をアサインします。</p>
+          <p class="service-desc fall-in" style="--fall-delay:160;">社内の相談窓口や産業医には話しづらい。症状が軽いので専門家に相談してよいか迷う。以前うまくいかなかった。同じ経験をした人の考え方を知りたい。利害関係のある相手には話しづらい——そうした場面でご利用いただいています。</p>
+          <p class="service-desc fall-in" style="--fall-delay:240;">費用は、スポット12,000円/回、定期8,000円/回です。</p>
         </div>
       </div>
     </div>
@@ -885,7 +917,7 @@ footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em;
           <p class="s-num">01</p>
           <p class="s-poetic">彼女の強さは、<br>誰にも証明を求めない。</p>
           <p class="s-tag">WOMEN'S MENTAL HEALTH</p>
-          <p>ライフイベントによるホルモン変化、キャリアと家庭の両立、周囲に相談しづらい不調——女性特有の悩みは、一般的なメンタルヘルス研修だけでは拾いきれません。産婦人科領域の知見と組織支援の実務を組み合わせ、女性が自分の状態を正しく言葉にできる環境づくりを支援します。</p>
+          <p>ライフイベントによる変化、キャリアと家庭の両立、周囲に相談しづらい不調——一般的なメンタルヘルス研修だけでは、拾いきれないものがあります。当社の保健師が延べ20,000人近くのカウンセリングで培った知見と、組織支援の実務を組み合わせ、自分の状態を自分の言葉にできる環境づくりを支援します。</p>
         </div>
         <div class="specialty-card fall-in" style="--fall-delay:90;">
           <div class="specialty-icon">
@@ -894,7 +926,7 @@ footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em;
           <p class="s-num">02</p>
           <p class="s-poetic">組織の不調は、<br>ひとりの弱さではない。</p>
           <p class="s-tag">CORPORATE / ORGANIZATIONAL MENTAL HEALTH</p>
-          <p>離職・休職・生産性の低下は、個人の問題として処理されがちですが、多くは組織構造や関係性のひずみに起因します。ストレスチェックの数値化にとどまらず、意思決定層への1on1支援と現場研修を両輪で行い、組織としてのメンタルヘルスを設計します。</p>
+          <p>離職や休職は、個人の問題として処理されがちですが、その多くは組織の構造や関係性のひずみとして現れます。経営層・管理職への1on1支援と、現場での実践型研修を両輪で行い、予防・早期介入から復帰まで、組織としてのメンタルヘルスを設計します。</p>
         </div>
         <div class="specialty-card fall-in" style="--fall-delay:180;">
           <div class="specialty-icon">
@@ -903,61 +935,75 @@ footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em;
           <p class="s-num">03</p>
           <p class="s-poetic">はじめての社会人生活に、<br>羅針盤を。</p>
           <p class="s-tag">NEW EMPLOYEE TRAINING</p>
-          <p>入社直後は、期待と不安が最も大きく揺れ動く時期です。リアリティショックへの向き合い方、報連相のこころ理学的な設計、早期離職を防ぐための1on1の作法まで、新人自身とその育成者の双方に向けた実践型プログラムを提供しています。</p>
+          <p>入社直後は、期待と不安がもっとも大きく揺れ動く時期です。理想と現実のギャップとの向き合い方、伝え方と頼り方の技術、日々の1on1の進め方まで。ワークショップ形式で手を動かしながら、新人ご本人と、育てる側の双方に向けてお届けします。</p>
         </div>
       </div>
 
       <div class="credentials">
         <div class="credential fall-in" style="--fall-delay:0;">
           <p class="tag">MEDIA</p>
-          <h3>NHK「おはよう日本」にて取材掲載</h3>
-          <p>挑戦する人のメンタルヘルスというテーマが全国放送で取り上げられ、経営とこころの両立という視点が社会に共有されました。</p>
+          <h3>NHK「おはよう日本」にて取材・放送</h3>
+          <p>挑戦する人のメンタルヘルスという主題で取材を受け、番組内で放送されました(2025年12月21日放送)。</p>
         </div>
         <div class="credential fall-in" style="--fall-delay:90;">
           <p class="tag">EDUCATION</p>
           <h3>清泉大学短期大学部でワークショップを開催</h3>
-          <p>教育機関との連携により、若い世代に向けたメンタルヘルスの実践的な学びの場を提供しています。</p>
+          <p>こども学科2年生を対象に「女性のワークライフの充実に向けたワークショップ」を実施しました。</p>
         </div>
         <div class="credential fall-in" style="--fall-delay:180;">
+          <p class="tag">TRAINING</p>
+          <h3>企業・大学・行政主催プログラム等での研修実績</h3>
+          <p>企業・大学・行政主催のプログラムなどで、知識×実践型メンタルヘルス研修とワークショップを実施しています。</p>
+        </div>
+        <div class="credential fall-in" style="--fall-delay:270;">
           <p class="tag">COMMUNITY</p>
           <h3>オンライン座談会「めんたるへるす塾」</h3>
-          <p>月額500円で参加できる継続的な学びの場。経営者・実務者が垣根を越えて対話を重ねています。</p>
+          <p>月額500円で参加できる、継続的な学びと対話の場です。</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ 05 安心の運用サポート ============ -->
-  <section class="section" id="support" data-index="3" data-label="CHAPTER III — SUPPORT">
+  <!-- ============ 05 MEMBER ============ -->
+  <section class="section" id="members" data-index="3" data-label="CHAPTER III — MEMBER">
     <div class="section-inner">
-      <p class="eyebrow fall-in">CHAPTER III — 安心の運用サポート</p>
-      <h2 class="headline fall-in">手を、離さない。</h2>
-      <p class="poetic fall-in" style="--fall-delay:120;">サイトも、こころと同じように&#8203;<br>整えながら育てていくものだと考えています。</p>
+      <p class="eyebrow fall-in">CHAPTER III — メンバー</p>
+      <h2 class="headline fall-in">語れる人が、<em>そばにいる</em>。</h2>
+      <p class="poetic fall-in" style="--fall-delay:120;">医療の専門性と、当事者としての経験。&#8203;<br>その両方を併せ持つチームが、同じ目線で伴走します。</p>
 
-      <div class="support-grid">
-        <div class="support-card fall-in" style="--fall-delay:0;">
-          <div class="support-icon">
-            <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="13" rx="1.5" stroke="var(--ink-dim)" stroke-width="1.2"/><path d="M8 21h8M12 18v3" stroke="var(--ink-dim)" stroke-width="1.2" stroke-linecap="round"/></svg>
+      <div class="member-grid">
+        <!-- 代表は先頭で1行分を使い、以降の3名を横並びに(auto-fit の段組はそのまま) -->
+        <div class="member-card fall-in" style="--fall-delay:0; grid-column:1/-1;">
+          <div class="member-icon">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 20 V5 M6 11 L12 5 L18 11" stroke="var(--ink-dim)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <p class="num">01</p>
-          <h3>むずかしい操作はありません</h3>
-          <p>お知らせの更新は、専門知識がなくても迷わない管理画面をご用意します。手順書も平易な言葉で作成し、操作に困ったときはこちらでいつでもサポートします。</p>
+          <p class="num">代表取締役</p>
+          <h3>小林 宣文</h3>
+          <p>精神疾患領域の創薬スタートアップで最高経営責任者を務めるも、道半ばでうつ病を発症し、2020年に代表を退任。闘病中の経験をnoteに公開したところ大きな反響があり、この課題の深さを強く実感しました。回復ののち、挑戦する人のメンタルヘルスを支える株式会社Re(アールイー)を設立。現在は株式会社Reと並行し、複数のスタートアップにも参画して経営・事業の支援を行っています。</p>
         </div>
-        <div class="support-card fall-in" style="--fall-delay:90;">
-          <div class="support-icon">
-            <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="6" width="16" height="13" rx="1.5" stroke="var(--ink-dim)" stroke-width="1.2"/><circle cx="12" cy="12.5" r="3.4" stroke="var(--ink-dim)" stroke-width="1.2"/><path d="M9 6 L10.2 4 H13.8 L15 6" stroke="var(--ink-dim)" stroke-width="1.2"/></svg>
+        <div class="member-card fall-in" style="--fall-delay:90;">
+          <div class="member-icon">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 3 L20 6 v6c0 4-3.4 7-8 9-4.6-2-8-5-8-9V6z" stroke="var(--ink-dim)" stroke-width="1.2" stroke-linejoin="round"/></svg>
           </div>
-          <p class="num">02</p>
-          <h3>写真は、鍵のかかる場所に</h3>
-          <p>ニュースリリースに使う写真は、専用の保管場所でまとめて管理します。誰が・いつ・何をアップロードしたかが分かる仕組みにし、迷子にならないようにします。</p>
+          <p class="num">認定精神保健福祉士</p>
+          <h3>土志田 務</h3>
+          <p>一般社団法人神奈川県精神保健福祉士協会 会長。精神科病院で20年以上の勤務実績を持ちます。医療機関の復職支援プログラムを活かした、知識×実践型メンタルヘルス研修を担当しています。</p>
         </div>
-        <div class="support-card fall-in" style="--fall-delay:180;">
-          <div class="support-icon">
-            <svg viewBox="0 0 24 24" fill="none"><rect x="6" y="11" width="12" height="9" rx="1.5" stroke="var(--ink-dim)" stroke-width="1.2"/><path d="M8.5 11 V8 a3.5 3.5 0 0 1 7 0 V11" stroke="var(--ink-dim)" stroke-width="1.2"/></svg>
+        <div class="member-card fall-in" style="--fall-delay:180;">
+          <div class="member-icon">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 21c-4-3-8-6.5-8-11a5 5 0 0 1 8-4 5 5 0 0 1 8 4c0 4.5-4 8-8 11z" stroke="var(--ink-dim)" stroke-width="1.2"/></svg>
           </div>
-          <p class="num">03</p>
-          <h3>パスワードのルールを、先にお渡しします</h3>
-          <p>管理画面やパスワードの取り扱いについて、専門用語を使わないガイドラインを事前にご用意します。定期的な見直しの時期もこちらからお知らせします。</p>
+          <p class="num">保健師</p>
+          <h3>綾部 由紀子</h3>
+          <p>株式会社キュリオ 代表取締役。病棟看護師、健康保険組合、企業の保健師を経て独立し、延べ20,000人近くのカウンセリングを実施してきました。労働衛生業務と個人セッションを担当しています。</p>
+        </div>
+        <div class="member-card fall-in" style="--fall-delay:270;">
+          <div class="member-icon">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 5 h16 v11 H9 l-5 4 z" stroke="var(--ink-dim)" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          </div>
+          <p class="num">事業開発 / ピアサポーター</p>
+          <h3>杉本 愛</h3>
+          <p>医薬品メーカー、創薬スタートアップを経て、ビジネスライターとして活動。事業開発と、当事者としてのピアサポートを担当しています。</p>
         </div>
       </div>
 
@@ -972,9 +1018,9 @@ footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em;
         </div>
       </div>
 
-      <p class="support-note fall-in">
-        「更新のたびに不安になる」を、なくしたい。<br>
-        運用が始まったあとこそ、私たちの本番だと考えています。
+      <p class="member-note fall-in">
+        メンタルヘルスの当事者経験や専門性を持つメンバーが在籍しています。<br>
+        産業医・弁護士も外部パートナーとして連携し、ご相談の内容に応じてチームに加わります。
       </p>
     </div>
   </section>
@@ -984,10 +1030,10 @@ footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em;
     <div class="section-inner">
       <p class="eyebrow fall-in" style="justify-content:center;">EPILOGUE — 水面へ</p>
       <h2 class="headline fall-in">まずは、話すところから。</h2>
-      <p class="poetic fall-in" style="margin-left:auto;margin-right:auto; --fall-delay:120;">研修のご相談も、1on1のご相談も、事業支援のご相談も。<br>小さな違和感の段階から、お気軽にお声がけください。</p>
+      <p class="poetic fall-in" style="margin-left:auto;margin-right:auto; --fall-delay:120;">オーダーメイド支援のご相談も、研修のご相談も、1on1のご相談も。<br>小さな違和感の段階から、お気軽にお声がけください。</p>
       <div class="contact-cta">
-        <a class="btn" href="mailto:info@re-example.co.jp">お問い合わせはこちら</a>
-        <p class="contact-meta">RECEPTION HOURS — MON–FRI 10:00–18:00<br>通常1〜2営業日以内にご返信いたします</p>
+        <a class="btn" href="https://remental.com/" target="_blank" rel="noopener">公式サイトのお問い合わせフォームへ</a>
+        <p class="contact-meta">公式サイト remental.com が別ウィンドウで開きます<br>株式会社Re(アールイー)<br>MENTAL HEALTH FOR CHALLENGERS</p>
       </div>
     </div>
   </section>
@@ -996,15 +1042,17 @@ footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em;
 
 <footer id="site-footer">
   <div>
-    <p class="f-logo">Re, Inc.</p>
+    <p class="f-logo">株式会社Re</p>
     <p class="f-meta">代表取締役 小林 宣文<br>Mental health for Challengers</p>
   </div>
   <nav class="f-nav">
     <a href="#top">TOP</a>
     <a href="#services">SERVICE</a>
+    <a href="#members">MEMBER</a>
     <a href="#contact">CONTACT</a>
   </nav>
-  <p class="f-meta">&copy; 2026 Re, Inc. All Rights Reserved.</p>
+  <p class="f-meta">&copy; 2026 株式会社Re All Rights Reserved.</p>
+  <p class="f-note">株式会社Reは医療機関ではありません。診断・治療は行わず、必要に応じて医療機関の受診をおすすめします。</p>
 </footer>
 
 <script>
@@ -1059,18 +1107,18 @@ footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em;
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ---- 1. スクロール進度 → --progress ----
-     support セクションの出現に合わせて、画面上方にごく淡い水面の光を足す。
+     member セクションの出現に合わせて、画面上方にごく淡い水面の光を足す。
      「深海から水面/空へ向かっている」感覚の下支え。 */
   var ticking = false;
-  var supportEl = document.getElementById('support');
+  var progressAnchorEl = document.getElementById('members');
   function smoothstep(edge0, edge1, x){
     var t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
     return t * t * (3 - 2 * t);
   }
   function updateProgress(){
     var eased = 0;
-    if(supportEl){
-      var rect = supportEl.getBoundingClientRect();
+    if(progressAnchorEl){
+      var rect = progressAnchorEl.getBoundingClientRect();
       var vh = window.innerHeight;
       var raw = (vh - rect.top) / (vh * 0.9);
       eased = smoothstep(0.0, 1.0, raw);
@@ -1091,7 +1139,8 @@ footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em;
   var curEl = document.querySelector('.progress-ui .cur');
   var labelEl = document.querySelector('.progress-ui [data-label]');
   var dotEl = document.querySelector('.progress-ui .track em');
-  var trackHeight = 64;
+  var trackHeight = 60;  // トラック64px − ドット4px(最終章でもドットが枠内に収まる)
+  var TOTAL_STEPS = 4;   // data-index の最大値(00〜04 の 5 セクション)
 
   if ('IntersectionObserver' in window){
     var io = new IntersectionObserver(function(entries){
@@ -1101,7 +1150,7 @@ footer .f-nav a{ font-family:var(--mono); font-size:11px; letter-spacing:0.14em;
           var label = entry.target.getAttribute('data-label') || '';
           if(curEl) curEl.textContent = String(idx).padStart(2,'0');
           if(labelEl) labelEl.textContent = label;
-          if(dotEl) dotEl.style.setProperty('--dot-y', (idx/6*trackHeight) + 'px');
+          if(dotEl) dotEl.style.setProperty('--dot-y', (idx/TOTAL_STEPS*trackHeight) + 'px');
         }
       });
     }, { threshold:[0.4, 0.6] });
