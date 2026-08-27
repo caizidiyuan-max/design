@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "2025-12-21-nhk",
+      "date": "2025-12-21",
+      "category": "media",
+      "categoryLabel": "MEDIA / メディア",
+      "title": "日本放送協会（NHK）「おはよう日本」で取材内容が放送されました（2025年12月21日放送）",
+      "body": "",
+      "link": "",
+      "image": "",
+      "imageAlt": "放送画像"
+    },
+    {
+      "id": "2026-02-18-seisen",
+      "date": "2026-02-18",
+      "category": "workshop",
+      "categoryLabel": "WORKSHOP / ワークショップ",
+      "title": "清泉大学短期大学部 こども学科2年生向けに「女性のワークライフの充実に向けたワークショップ」を開催しました（2025年9月23日・2026年1月20日実施）",
+      "body": "",
+      "link": "",
+      "image": "",
+      "imageAlt": "開催風景"
+    },
+    {
+      "id": "2026-06-06-mentaljuku",
+      "date": "2026-06-06",
+      "category": "service",
+      "categoryLabel": "SERVICE / 自社サービス",
+      "title": "オンライン座談会「めんたるへるす塾」を開催中です（月額500円）",
+      "body": "",
+      "link": "",
+      "image": "",
+      "imageAlt": "座談会"
+    }
+  ]
+}
